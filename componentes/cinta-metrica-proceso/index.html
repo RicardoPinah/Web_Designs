@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cinta métrica de proceso</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --oscuro: #1c211e;
+    --claro: #f2f3ef;
+    --acento-1: #f99a31;
+    --acento-2: #f99a62;
+    --acento-3: #f2ab82;
+    --apagado: #5d645f;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'Instrument Sans', system-ui, sans-serif;
+    --edge: max(clamp(1.5rem, 6vw, 6rem), calc((100vw - 104rem) / 2));
+    --space: clamp(7rem, 13vw, 15rem);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: var(--claro); color: var(--oscuro); font: 400 1.125rem/1.7 var(--body); }
+  h2, h3 { margin: 0; font-family: var(--display); font-weight: 400; }
+  h2 { font-size: clamp(2.125rem, 1.6rem + 1.9vw, 3.625rem); line-height: 1.15; }
+  h3 { font-size: clamp(1.4375rem, 1.15rem + 0.85vw, 2rem); line-height: 1.2; }
+  p { margin: 0; max-width: 62ch; }
+  .relleno { display: grid; place-items: center; min-height: 70vh; color: var(--apagado); }
+
+  .process-stage { padding: var(--space) var(--edge); }
+  .section-head { display: grid; justify-items: center; gap: 1.25rem; max-width: 78rem; margin: 0 auto clamp(3.5rem, 6vw, 6.5rem); text-align: center; }
+  .section-head p { color: var(--apagado); }
+  .tape-measure { --tape-width: clamp(3.75rem, 7vw, 6rem); }
+  .tape-case { position: relative; z-index: 1; display: block; width: calc(var(--tape-width) * 1.9); margin-bottom: -2px; }
+  .tape { --pull: 1; position: relative; margin: 0; padding: 1.5rem 0 0; list-style: none; }
+  .tape::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: var(--tape-width);
+    height: calc(var(--pull) * 100%);
+    background-color: var(--acento-1);
+    background-image:
+      linear-gradient(var(--oscuro) 2px, transparent 2px),
+      linear-gradient(var(--oscuro) 1px, transparent 1px);
+    background-position: left bottom;
+    background-size: 42% 64px, 22% 8px;
+    background-repeat: repeat-y;
+  }
+  .tape::after {
+    content: '';
+    position: absolute;
+    opacity: calc(var(--pull) * 50);
+    top: calc(var(--pull) * 100% - 4px);
+    left: -4px;
+    width: calc(var(--tape-width) + 8px);
+    height: 10px;
+    background: var(--acento-3);
+    border-radius: 0 0 4px 4px;
+  }
+  .tape li { position: relative; padding: 0 0 clamp(3.25rem, 6vw, 5rem) calc(var(--tape-width) + clamp(1.25rem, 3vw, 2.5rem)); }
+  .tape li:last-child { padding-bottom: 1rem; }
+  .tape-mark {
+    position: absolute;
+    top: 0.1rem;
+    left: 0;
+    width: var(--tape-width);
+    padding-right: 0.5rem;
+    color: var(--oscuro);
+    font: 700 clamp(1.75rem, 3.5vw, 2.75rem)/1 var(--body);
+    text-align: right;
+  }
+  .tape h3 { margin-bottom: 0.75rem; }
+  .tape p { color: var(--apagado); }
+
+  .tape.is-animated { --pull: 0; }
+  .is-animated .tape-mark, .is-animated h3, .is-animated p {
+    opacity: 0;
+    transition: opacity 0.45s ease-out, transform 0.8s cubic-bezier(0.2, 1.35, 0.4, 1);
+  }
+  .is-animated .tape-mark { transform: scale(0.4); transform-origin: right center; }
+  .is-animated h3 { transform: translateX(-1.75rem); }
+  .is-animated p { transform: translateX(-1.75rem); transition-delay: 0.09s; }
+  .is-animated .is-reached :is(.tape-mark, h3, p) { opacity: 1; transform: none; }
+
+  /* En pantallas anchas la cinta sale hacia la derecha y los pasos quedan debajo. */
+  @media (min-width: 75rem) {
+    /* Cada paso se gana con scroll: la sección queda fija hasta que la cinta termina de salir. */
+    .process.is-pinned { height: calc(100svh + 7 * 42svh); }
+    .is-pinned .process-stage { position: sticky; top: 0; display: grid; align-content: center; min-height: 100svh; padding-block: 2rem; }
+    .is-pinned .section-head { margin-bottom: clamp(2.5rem, 7svh, 5rem); }
+    .tape-measure {
+      --tape-height: clamp(3.25rem, 4vw, 4.25rem);
+      --case-width: calc(var(--tape-height) * 3.4);
+      display: grid;
+      grid-template-columns: var(--case-width) minmax(0, 1fr);
+    }
+    .tape-case { width: 100%; margin: 0; }
+    .tape {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 0 clamp(1.25rem, 2vw, 2.5rem);
+      margin-left: -2px;
+      padding: calc(var(--case-width) * 0.13 + var(--tape-height) + 2.25rem) 0 0;
+    }
+    .tape::before {
+      inset: calc(var(--case-width) * 0.13) auto auto 0;
+      width: calc(var(--pull) * 100%);
+      height: var(--tape-height);
+      background-image:
+        linear-gradient(to right, var(--oscuro) 2px, transparent 2px),
+        linear-gradient(to right, var(--oscuro) 1px, transparent 1px);
+      background-position: left top;
+      background-size: 64px 42%, 8px 22%;
+      background-repeat: repeat-x;
+    }
+    .tape::after {
+      top: calc(var(--case-width) * 0.13 - 4px);
+      left: calc(var(--pull) * 100% - 4px);
+      width: 10px;
+      height: calc(var(--tape-height) + 8px);
+      border-radius: 0 4px 4px 0;
+    }
+    .tape li, .tape li:last-child { padding: 0; }
+    .tape h3 { font-size: clamp(1.25rem, 1.55vw, 2rem); }
+    .tape-mark {
+      top: calc(var(--tape-height) * -1 - 2.25rem);
+      display: flex;
+      align-items: center;
+      width: auto;
+      height: var(--tape-height);
+      padding: 0 0 0 0.6rem;
+      font-size: clamp(1.5rem, 2vw, 2.25rem);
+      text-align: left;
+      transform-origin: left center;
+    }
+    .is-animated .tape-mark { transform-origin: left center; }
+    .is-animated h3, .is-animated p { transform: translateY(1rem); }
+  }
+</style>
+</head>
+<body>
+  <div class="relleno">Baja para ver la cinta</div>
+
+  <section class="process">
+    <div class="process-stage">
+      <div class="section-head">
+        <h2>Siete pasos, un equipo</h2>
+        <p>Texto de ejemplo que resume el proceso.</p>
+      </div>
+      <div class="tape-measure">
+        <svg class="tape-case" viewBox="0 0 393 179" aria-hidden="true">
+          <path fill="var(--acento-1)" fill-rule="evenodd" d="M20 0H373A20 20 0 0 1 393 20V159A20 20 0 0 1 373 179H20A20 20 0 0 1 0 159V20A20 20 0 0 1 20 0ZM44 19H368A15 15 0 0 1 383 34V159A15 15 0 0 1 368 174H44A15 15 0 0 1 29 159V34A15 15 0 0 1 44 19Z"/>
+          <path fill="var(--acento-2)" fill-rule="evenodd" d="M46 24H365A13 13 0 0 1 378 37V157A13 13 0 0 1 365 170H46A13 13 0 0 1 33 157V37A13 13 0 0 1 46 24ZM71 41H359A10 10 0 0 1 369 51V154A10 10 0 0 1 359 164H71A10 10 0 0 1 61 154V51A10 10 0 0 1 71 41Z"/>
+          <path fill="var(--acento-3)" fill-rule="evenodd" d="M75 48H355A9 9 0 0 1 364 57V151A9 9 0 0 1 355 160H75A9 9 0 0 1 66 151V57A9 9 0 0 1 75 48ZM100 65H347A7 7 0 0 1 354 72V143A7 7 0 0 1 347 150H100A7 7 0 0 1 93 143V72A7 7 0 0 1 100 65Z"/>
+        </svg>
+        <ol class="tape">
+          <li><span class="tape-mark" aria-hidden="true">1</span><h3>Paso uno</h3><p>Descripción breve de este paso.</p></li>
+          <li><span class="tape-mark" aria-hidden="true">2</span><h3>Paso dos</h3><p>Descripción breve de este paso.</p></li>
+          <li><span class="tape-mark" aria-hidden="true">3</span><h3>Paso tres</h3><p>Descripción breve de este paso.</p></li>
+          <li><span class="tape-mark" aria-hidden="true">4</span><h3>Paso cuatro</h3><p>Descripción breve de este paso.</p></li>
+          <li><span class="tape-mark" aria-hidden="true">5</span><h3>Paso cinco</h3><p>Descripción breve de este paso.</p></li>
+          <li><span class="tape-mark" aria-hidden="true">6</span><h3>Paso seis</h3><p>Descripción breve de este paso.</p></li>
+          <li><span class="tape-mark" aria-hidden="true">7</span><h3>Paso siete</h3><p>Descripción breve de este paso.</p></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <div class="relleno">Fin de la sección</div>
+
+<script>
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // La cinta sale de su caja con un muelle y cada paso aparece cuando la punta llega a él.
+    const tape = document.querySelector('.tape');
+    const steps = [...tape.querySelectorAll('li')];
+    const stage = document.querySelector('.process');
+    const sideways = matchMedia('(min-width: 75rem)');
+
+    tape.classList.add('is-animated');
+    let position = 0;
+    let speed = 0;
+    let target = 0;
+    let running = false;
+
+    const render = () => {
+      speed = (speed + (target - position) * 0.018) * 0.84;
+      position += speed;
+      tape.style.setProperty('--pull', Math.max(0, Math.min(position, 1)).toFixed(4));
+
+      const tip = position * (sideways.matches ? tape.offsetWidth : tape.offsetHeight);
+      steps.forEach((step) => {
+        const start = sideways.matches ? step.offsetLeft : step.offsetTop;
+        step.classList.toggle('is-reached', tip >= start + 6);
+      });
+
+      if (Math.abs(target - position) > 0.0005 || Math.abs(speed) > 0.0005) {
+        requestAnimationFrame(render);
+      } else {
+        running = false;
+      }
+    };
+
+    // La cinta sigue al scroll en los dos sentidos: en pantallas anchas la sección queda fija mientras crece.
+    const update = () => {
+      let pulled;
+      if (sideways.matches) {
+        const { top, height } = stage.getBoundingClientRect();
+        pulled = -top / ((height - innerHeight) * 0.95);
+      } else {
+        const { top, height } = tape.getBoundingClientRect();
+        pulled = (innerHeight * 0.7 - top) / height;
+      }
+      target = Math.max(0, Math.min(pulled, 1));
+      if (!running && target !== position) {
+        running = true;
+        requestAnimationFrame(render);
+      }
+    };
+
+    const pin = () => {
+      stage.classList.toggle('is-pinned', sideways.matches);
+      update();
+    };
+
+    addEventListener('scroll', update, { passive: true });
+    addEventListener('resize', update);
+    sideways.addEventListener('change', pin);
+    pin();
+  }
+</script>
+</body>
+</html>

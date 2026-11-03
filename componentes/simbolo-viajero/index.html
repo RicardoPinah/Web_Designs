@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Símbolo viajero</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --oscuro: #1c211e;
+    --claro: #f2f3ef;
+    --acento-1: #f99a31;
+    --acento-2: #f99a62;
+    --acento-3: #f2ab82;
+    --apagado: #5d645f;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'Instrument Sans', system-ui, sans-serif;
+    --edge: max(clamp(1.5rem, 6vw, 6rem), calc((100vw - 104rem) / 2));
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: var(--claro); color: var(--oscuro); font: 400 1.125rem/1.7 var(--body); overflow-x: clip; }
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  h1, h2 { margin: 0; font-family: var(--display); font-weight: 400; line-height: 1.15; }
+  h1 { font-size: clamp(2.375rem, 5vw, 5rem); }
+  h2 { font-size: clamp(2.125rem, 1.6rem + 1.9vw, 3.625rem); }
+  p { margin: 0; color: var(--apagado); }
+  section { position: relative; min-height: 100svh; padding: var(--edge); }
+
+  .flyer { position: fixed; top: 0; left: 0; z-index: 4; overflow: visible; pointer-events: none; visibility: hidden; }
+  .flyer-1 { fill: var(--acento-1); }
+  .flyer-2 { fill: var(--acento-2); }
+  .flyer-3 { fill: var(--acento-3); }
+
+  /* Los puntos de parada sin contenido solo marcan el sitio; deben tener la proporción del símbolo. */
+  .ancla { display: block; aspect-ratio: 393 / 179; }
+  .ancla-header { position: absolute; top: 1.5rem; left: var(--edge); width: 3.25rem; }
+
+  .inicio { display: grid; align-content: center; gap: 1rem; }
+  .con-foto { display: grid; grid-template-columns: minmax(0, 11fr) minmax(0, 12fr); align-items: center; gap: clamp(3.5rem, 9vw, 10rem); }
+  .foto { aspect-ratio: 5 / 4; height: auto; border-radius: 9px; }
+  .cifras { display: grid; place-items: center; background: var(--oscuro); color: var(--claro); }
+  .caja {
+    position: relative;
+    z-index: 6;
+    padding: clamp(2.5rem, 4.5vw, 4.75rem);
+    background: var(--acento-1);
+    border-radius: 14px;
+    color: var(--oscuro);
+    text-align: center;
+  }
+  .caja strong { display: block; font-size: clamp(2.75rem, 1.8rem + 3vw, 5rem); line-height: 1; }
+  .final { display: grid; align-content: center; gap: 1rem; overflow: hidden; }
+  .final > :not(.ancla-final) { position: relative; max-width: 42%; }
+  .ancla-final { position: absolute; top: 50%; right: -8%; width: min(56vw, 62rem); transform: translateY(-50%); }
+
+  @media (max-width: 60rem) {
+    .con-foto { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .flyer { display: none; }
+  }
+</style>
+</head>
+<body>
+  <svg class="flyer" aria-hidden="true"><path class="flyer-1" fill-rule="evenodd"/><path class="flyer-2" fill-rule="evenodd"/><path class="flyer-3" fill-rule="evenodd"/></svg>
+
+  <section class="inicio">
+    <!-- data-parada: tal-cual ocupa el elemento, rodea deja el elemento en el hueco, detras asoma por los bordes. -->
+    <span class="ancla ancla-header" data-parada="tal-cual"></span>
+    <h1>Un único símbolo recorre la página</h1>
+    <p>Baja: viaja de parada en parada y vuelve al subir.</p>
+  </section>
+
+  <section class="con-foto">
+    <img class="foto" src="https://picsum.photos/seed/viajero/1000/800" alt="Foto de ejemplo" data-parada="rodea" data-k="0.6" data-pausa="0.3">
+    <div><h2>Primera parada</h2><p>El símbolo enmarca la foto con el hueco de su aro interior.</p></div>
+  </section>
+
+  <section class="cifras">
+    <div class="caja" data-parada="detras" data-margen="16" data-pausa="0.2"><strong>180+</strong>Asoma por detrás</div>
+  </section>
+
+  <section class="final">
+    <span class="ancla ancla-final" data-parada="tal-cual"></span>
+    <h2>Última parada</h2>
+    <p>Termina cortado por el borde derecho y se va con la página.</p>
+  </section>
+
+<script>
+  // Un único símbolo recorre la página con el scroll, de parada en parada.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const flyer = document.querySelector('.flyer');
+    const [path1, path2, path3] = flyer.querySelectorAll('path');
+    const anchors = [...document.querySelectorAll('[data-parada]')];
+    const easeFlight = (t) => t * t * (3 - 2 * t);
+    const limit = (value) => Math.max(0, Math.min(value, 1));
+    const lerp = (from, to, t) => from + (to - from) * t;
+    let stops = [];
+
+    // Cada aro se dibuja a partir de su tamaño, con un grosor k independiente.
+    const box = (x1, y1, x2, y2, r) =>
+      `M${x1 + r} ${y1}H${x2 - r}A${r} ${r} 0 0 1 ${x2} ${y1 + r}V${y2 - r}A${r} ${r} 0 0 1 ${x2 - r} ${y2}H${x1 + r}A${r} ${r} 0 0 1 ${x1} ${y2 - r}V${y1 + r}A${r} ${r} 0 0 1 ${x1 + r} ${y1}Z`;
+    const shape = ({ left, top, width: w, height: h, k }) => {
+      flyer.style.transform = `translate(${left}px, ${top}px)`;
+      flyer.setAttribute('width', w);
+      flyer.setAttribute('height', h);
+      flyer.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      path1.setAttribute('d', box(0, 0, w, h, 20 * k) + box(29 * k, 19 * k, w - 10 * k, h - 5 * k, 15 * k));
+      path2.setAttribute('d', box(33 * k, 24 * k, w - 15 * k, h - 9 * k, 13 * k) + box(61 * k, 41 * k, w - 24 * k, h - 15 * k, 10 * k));
+      path3.setAttribute('d', box(66 * k, 48 * k, w - 29 * k, h - 19 * k, 9 * k) + box(93 * k, 65 * k, w - 39 * k, h - 29 * k, 7 * k));
+    };
+
+    // Formas de colocarse: tal cual, rodeando un elemento con el hueco, o asomando por detrás de él.
+    const direct = (element) => () => {
+      const { left, top, width, height } = element.getBoundingClientRect();
+      return { left, top, width, height, k: width / 393 };
+    };
+    const around = (element, k) => () => {
+      const { left, top, width, height } = element.getBoundingClientRect();
+      return { left: left - 93 * k, top: top - 65 * k, width: width + 132 * k, height: height + 94 * k, k };
+    };
+    const behind = (element, margin) => () => {
+      const { left, top, width, height } = element.getBoundingClientRect();
+      return { left: left - margin, top: top - margin, width: width + margin * 2, height: height + margin * 2, k: margin / 10 };
+    };
+    const placer = (element) => {
+      const { parada, k, margen } = element.dataset;
+      if (parada === 'rodea') return around(element, Number(k || 0.6) * Math.min(1, innerWidth / 1100));
+      if (parada === 'detras') return behind(element, Number(margen || 16) * Math.max(Math.min(1, innerWidth / 1100), 0.6));
+      return direct(element);
+    };
+
+    // Llega a cada parada cuando su elemento está centrado en pantalla, y se queda data-pausa pantallas.
+    const measure = () => {
+      const vh = innerHeight;
+      const pageEnd = document.documentElement.scrollHeight - vh;
+      let last = 0;
+      stops = anchors.map((element, index) => {
+        const { top, height } = element.getBoundingClientRect();
+        const isEnd = index === anchors.length - 1;
+        const centered = top + scrollY + height / 2 - vh / 2;
+        const at = index === 0 ? 0 : Math.max(isEnd ? Math.min(pageEnd, centered) : centered, last);
+        const until = isEnd ? Infinity : at + Number(element.dataset.pausa || 0) * vh;
+        last = until + 1;
+        return { at, until, place: placer(element) };
+      });
+    };
+
+    const draw = () => {
+      const y = scrollY;
+      let i = stops.length - 2;
+      while (i > 0 && y < stops[i].at) i--;
+      const from = stops[i];
+      const to = stops[i + 1];
+      const a = from.place();
+      let place = a;
+      if (y > from.until) {
+        const t = easeFlight(limit((y - from.until) / (to.at - from.until)));
+        const b = to.place();
+        place = {
+          left: lerp(a.left, b.left, t),
+          top: lerp(a.top, b.top, t),
+          width: lerp(a.width, b.width, t),
+          height: lerp(a.height, b.height, t),
+          k: lerp(a.k, b.k, t),
+        };
+      }
+      flyer.style.visibility = 'visible';
+      shape(place);
+    };
+
+    let queued = false;
+    const request = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        draw();
+      });
+    };
+    const refresh = () => {
+      measure();
+      draw();
+    };
+    addEventListener('scroll', request, { passive: true });
+    addEventListener('resize', refresh);
+    addEventListener('load', refresh);
+    document.fonts.ready.then(refresh);
+    refresh();
+  }
+</script>
+</body>
+</html>

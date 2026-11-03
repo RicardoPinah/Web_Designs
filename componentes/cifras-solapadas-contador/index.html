@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cifras solapadas con contador</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --oscuro: #1c211e;
+    --claro: #f2f3ef;
+    --acento-1: #f99a31;
+    --acento-3: #f2ab82;
+    --body: 'Instrument Sans', system-ui, sans-serif;
+    --edge: max(clamp(1.5rem, 6vw, 6rem), calc((100vw - 104rem) / 2));
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: var(--claro); color: var(--oscuro); font: 400 1.125rem/1.7 var(--body); }
+  .relleno { min-height: 80vh; }
+  .relleno-oscuro { min-height: 80vh; background: var(--oscuro); }
+
+  /* Las cifras flotan: el 30 % inferior de la banda queda sobre la sección siguiente.
+     Los dos colores del degradado deben ser los fondos de la sección anterior y la siguiente. */
+  .stats-band {
+    position: relative;
+    margin-bottom: -1px;
+    padding: 0 var(--edge);
+    background: linear-gradient(to bottom, var(--claro) 70%, var(--oscuro) 70%);
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    overflow: hidden;
+    background: var(--acento-1);
+    border-radius: 14px;
+    box-shadow: 0 1.5rem 3rem rgb(16 19 17 / 0.28);
+  }
+  .stat {
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    padding: clamp(2.5rem, 4.5vw, 4.75rem) 1rem;
+    background: var(--acento-1);
+    color: var(--oscuro);
+    text-align: center;
+  }
+  .stat:nth-child(even) { background: var(--acento-3); }
+  .stat strong {
+    font-size: clamp(2.75rem, 1.8rem + 3vw, 5rem);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .stat > span { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.08em; line-height: 1.35; text-transform: uppercase; }
+  @media (max-width: 60rem) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+  <div class="relleno"></div>
+
+  <div class="stats-band">
+    <section class="stats" aria-label="Datos de ejemplo">
+      <div class="stat"><strong><span data-count="20">20</span></strong><span>Años</span></div>
+      <div class="stat"><strong><span data-count="150">150</span>+</strong><span>Clientes</span></div>
+      <div class="stat"><strong><span data-count="300">300</span>+</strong><span>Proyectos</span></div>
+      <div class="stat"><strong><span data-count="500">500</span>+</strong><span>Piezas</span></div>
+    </section>
+  </div>
+
+  <div class="relleno-oscuro"></div>
+
+<script>
+  // Las cifras cuentan hasta su valor cada vez que entran en pantalla.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const counted = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const number = entry.target;
+        cancelAnimationFrame(number.frame);
+        if (!entry.isIntersecting) return;
+        const end = Number(number.dataset.count);
+        const start = performance.now();
+        const tick = (now) => {
+          const progress = Math.min((now - start) / 1600, 1);
+          number.textContent = String(Math.round(end * (1 - (1 - progress) ** 3)));
+          if (progress < 1) number.frame = requestAnimationFrame(tick);
+        };
+        number.frame = requestAnimationFrame(tick);
+      });
+    });
+    document.querySelectorAll('[data-count]').forEach((number) => counted.observe(number));
+  }
+</script>
+</body>
+</html>

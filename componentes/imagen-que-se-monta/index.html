@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Imagen que se monta</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --oscuro: #1c211e;
+    --claro: #f2f3ef;
+    --acento-1: #f99a31;
+    --apagado-sobre-oscuro: #c4c9c4;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'Instrument Sans', system-ui, sans-serif;
+    --edge: max(clamp(1.5rem, 6vw, 6rem), calc((100vw - 104rem) / 2));
+    --space: clamp(7rem, 13vw, 15rem);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: var(--oscuro); color: var(--claro); font: 400 1.125rem/1.7 var(--body); overflow-x: clip; }
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  h2 { margin: 0; font: 400 clamp(2.125rem, 1.6rem + 1.9vw, 3.625rem)/1.15 var(--display); }
+  p { margin: 0; color: var(--apagado-sobre-oscuro); }
+  .relleno { display: grid; place-items: center; min-height: 70vh; color: var(--apagado-sobre-oscuro); }
+
+  .fabrication {
+    display: grid;
+    grid-template-columns: minmax(0, 12fr) minmax(0, 11fr);
+    align-items: center;
+    gap: clamp(3.5rem, 7vw, 8rem);
+    padding: var(--space) var(--edge);
+  }
+  .fabrication-text { display: grid; gap: 1.6rem; }
+  .assembly { position: relative; aspect-ratio: 3 / 2; }
+  /* Mientras se monta, la sección queda fija para que todo ocurra dentro de la pantalla. */
+  .fabrication-pin.is-pinned { height: calc(100svh + 150svh); }
+  .is-pinned .fabrication { position: sticky; top: 0; min-height: 100svh; padding-block: 2rem; }
+  .assembly-room, .assembly-full, .assembly-pieces { position: absolute; inset: 0; }
+  .assembly-room { background: #2b312d; border-radius: clamp(0.6rem, 1.1vw, 1.1rem); box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.35); }
+  .assembly-full { border-radius: clamp(0.6rem, 1.1vw, 1.1rem); }
+  .assembly-pieces { display: none; }
+  .is-building .assembly-pieces { display: block; }
+  .is-building .assembly-full { opacity: 0; }
+  .is-built .assembly-full { opacity: 1; }
+  .is-built .assembly-pieces { display: none; }
+  .piece { position: absolute; background-repeat: no-repeat; will-change: transform, opacity; }
+
+  @media (max-width: 60rem) {
+    .fabrication { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+</head>
+<body>
+  <div class="relleno">Baja para ver el montaje</div>
+
+  <div class="fabrication-pin">
+    <section class="fabrication">
+      <div class="fabrication-text">
+        <h2>Pieza a pieza</h2>
+        <p>Texto de ejemplo que acompaña al montaje.</p>
+      </div>
+      <div class="assembly">
+        <div class="assembly-room"></div>
+        <img class="assembly-full" src="https://picsum.photos/seed/montaje/1200/800" alt="Imagen de ejemplo">
+        <div class="assembly-pieces" aria-hidden="true"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="relleno">Fin de la sección</div>
+
+<script>
+  // El mueble se monta pieza a pieza mientras la sección sube por la pantalla.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const FOTO = 'https://picsum.photos/seed/montaje/1200/800';
+    const COLUMNAS = 6;
+    const FILAS = 5;
+
+    const assembly = document.querySelector('.assembly');
+    const holder = assembly.querySelector('.assembly-pieces');
+    const pin = document.querySelector('.fabrication-pin');
+    const wide = matchMedia('(min-width: 60.01rem)');
+    const clamp = (value) => Math.max(0, Math.min(value, 1));
+    const ease = (t) => t * t * (3 - 2 * t);
+    const mix = (from, to, t) => from + (to - from) * t;
+
+    // Se trocea en una rejilla y se monta de abajo arriba: x e y dicen de dónde llega cada pieza, size con qué escala.
+    const parts = [];
+    for (let row = FILAS - 1; row >= 0; row--) {
+      for (let column = 0; column < COLUMNAS; column++) {
+        const element = document.createElement('span');
+        element.className = 'piece';
+        element.style.cssText = `left: ${column * 100 / COLUMNAS}%; top: ${row * 100 / FILAS}%; width: ${100 / COLUMNAS}%; height: ${100 / FILAS}%;`
+          + `background-image: url('${FOTO}'); background-size: ${COLUMNAS * 100}% ${FILAS * 100}%;`
+          + `background-position: ${column / (COLUMNAS - 1) * 100}% ${row / (FILAS - 1) * 100}%;`;
+        holder.append(element);
+        const side = column < COLUMNAS / 2 ? -1 : 1;
+        parts.push(row === FILAS - 1
+          ? { element, x: 0, y: 0.5, size: 1 }
+          : { element, x: side * 0.4, y: 0.1, size: row > FILAS / 2 ? 1.35 : 0.92 });
+      }
+    }
+
+    let built = 0;
+    let wanted = 0;
+    let moving = false;
+    let time = 0;
+    const pinBuild = () => pin.classList.toggle('is-pinned', wide.matches);
+    assembly.classList.add('is-building');
+    pinBuild();
+
+    const draw = (p) => {
+      const { width, height } = assembly.getBoundingClientRect();
+      parts.forEach(({ element, x, y, size }, i) => {
+        const start = (i / parts.length) * 0.82;
+        const t = ease(clamp((p - start) / 0.18));
+        const away = 1 - t;
+        element.style.transform = `translate(${x * width * away}px, ${y * height * away}px) rotate(${(i % 2 ? 3 : -3) * away}deg) scale(${mix(size, 1, t)})`;
+        element.style.opacity = clamp(t * 3);
+      });
+      assembly.classList.toggle('is-built', p >= 0.995);
+    };
+    // El suavizado depende del tiempo y no de los fotogramas, para que vaya igual en equipos lentos.
+    const smoothing = (rate, previous, now) => 1 - Math.exp(-rate * Math.min(now - previous, 200) / 1000);
+    const step = (now) => {
+      built += (wanted - built) * smoothing(8, time || now - 16, now);
+      time = now;
+      if (Math.abs(wanted - built) < 0.001) built = wanted;
+      draw(built);
+      if (built === wanted) {
+        moving = false;
+        time = 0;
+      } else requestAnimationFrame(step);
+    };
+    const follow = () => {
+      if (wide.matches) {
+        const { top, height } = pin.getBoundingClientRect();
+        // Empieza cuando la imagen ya se ve casi entera, antes de que la sección quede fija.
+        // Termina antes de que la sección se suelte, para que la imagen montada se vea un momento.
+        const lead = innerHeight * 0.25;
+        wanted = clamp((lead - top) / (lead + (height - innerHeight) * 0.68));
+      } else {
+        const { bottom } = assembly.getBoundingClientRect();
+        wanted = clamp((innerHeight - bottom) / (innerHeight * 0.55));
+      }
+      if (!moving) {
+        moving = true;
+        requestAnimationFrame(step);
+      }
+    };
+    addEventListener('scroll', follow, { passive: true });
+    addEventListener('resize', follow);
+    wide.addEventListener('change', () => {
+      pinBuild();
+      follow();
+    });
+    draw(0);
+    follow();
+  }
+</script>
+</body>
+</html>

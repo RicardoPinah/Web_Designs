@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero con entrada en collage</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  // Pon SOLO_UNA_VEZ a true para que la entrada se vea solo al llegar a la web y no en cada visita a la página.
+  (function () {
+    var SOLO_UNA_VEZ = false;
+    var seen = false;
+    try { seen = SOLO_UNA_VEZ && sessionStorage.getItem('intro-seen') === '1'; } catch (error) {}
+    if (seen || location.hash || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.documentElement.classList.add('hero-intro');
+    try { sessionStorage.setItem('intro-seen', '1'); } catch (error) {}
+  })();
+</script>
+<style>
+  :root {
+    --oscuro: #1c211e;
+    --claro: #f2f3ef;
+    --blanco: #fff;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'Instrument Sans', system-ui, sans-serif;
+    --edge: max(clamp(1.5rem, 6vw, 6rem), calc((100vw - 104rem) / 2));
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: var(--claro); color: var(--oscuro); font: 400 1.125rem/1.7 var(--body); }
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  p { margin: 0; }
+
+  .hero { position: relative; display: grid; place-items: center; min-height: 100svh; color: var(--blanco); background: var(--oscuro); }
+  .hero-photo { position: absolute; inset: 0; }
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgb(16 19 17 / 0.68), rgb(16 19 17 / 0.42) 75%),
+      linear-gradient(to bottom, rgb(16 19 17 / 0.55), transparent 22%);
+  }
+
+  .intro { display: none; }
+  .hero-intro .intro {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: block;
+    overflow: hidden;
+    background: var(--oscuro);
+    /* Si algo falla, la entrada desaparece sola y deja ver la página. */
+    animation: intro-rescue 0.4s 12s forwards;
+  }
+  .intro-card { position: absolute; inset: 0; border-radius: 42px; opacity: 0; }
+  /* El mismo oscurecido que el hero, para que el paso a la foto real no se note. */
+  .intro-shade {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: radial-gradient(ellipse at center, rgb(16 19 17 / 0.68), rgb(16 19 17 / 0.42) 75%),
+      linear-gradient(to bottom, rgb(16 19 17 / 0.55), transparent 22%);
+    opacity: 0;
+  }
+  @keyframes intro-rescue {
+    to { opacity: 0; visibility: hidden; }
+  }
+  .hero-intro .hero-text > :not(h1),
+  .hero-intro .word > span { opacity: 0; animation: hero-rescue 0.4s 12s forwards; }
+  @keyframes hero-rescue {
+    to { opacity: 1; transform: none; }
+  }
+
+  /* El titular sube palabra a palabra desde detrás de una máscara; luego llega el resto. */
+  .word { display: inline-block; overflow: hidden; vertical-align: top; }
+  .word > span { display: inline-block; }
+  .intro-text .hero-text { z-index: 4; }
+  .intro-text .word > span { animation: word-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(0.55s + var(--i) * 70ms) both; }
+  .intro-text .hero-text > :not(h1) { animation: hero-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 1.15s both; }
+  @keyframes word-rise {
+    from { opacity: 1; transform: translateY(110%); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes hero-rise {
+    from { opacity: 0; transform: translateY(1.5rem); }
+    to { opacity: 1; transform: none; }
+  }
+  .hero-text {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: clamp(1.75rem, 3vw, 2.75rem);
+    padding: 8rem var(--edge);
+    text-align: center;
+  }
+  h1 {
+    max-width: 19em;
+    margin: 0;
+    font: 400 clamp(2.375rem, 5vw, 5.75rem)/1.12 var(--display);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+  .hero-text p { max-width: 72ch; font-size: clamp(1.25rem, 1rem + 0.8vw, 1.75rem); line-height: 1.45; text-wrap: balance; }
+</style>
+</head>
+<body>
+  <section class="hero">
+    <img class="hero-photo" src="https://picsum.photos/seed/collage-0/1920/1080" alt="Foto de ejemplo" fetchpriority="high">
+    <!-- La primera tarjeta es la foto con la que termina la entrada. -->
+    <div class="intro" aria-hidden="true">
+      <img class="intro-card" src="https://picsum.photos/seed/collage-0/1920/1080" alt="">
+      <img class="intro-card" src="https://picsum.photos/seed/collage-1/1920/1080" alt="">
+      <img class="intro-card" src="https://picsum.photos/seed/collage-2/1920/1080" alt="">
+      <img class="intro-card" src="https://picsum.photos/seed/collage-3/1920/1080" alt="">
+      <img class="intro-card" src="https://picsum.photos/seed/collage-4/1920/1080" alt="">
+      <img class="intro-card" src="https://picsum.photos/seed/collage-5/1920/1080" alt="">
+      <img class="intro-card" src="https://picsum.photos/seed/collage-6/1920/1080" alt="">
+      <img class="intro-card" src="https://picsum.photos/seed/collage-7/1920/1080" alt="">
+      <img class="intro-card" src="https://picsum.photos/seed/collage-8/1920/1080" alt="">
+      <div class="intro-shade"></div>
+    </div>
+    <div class="hero-text">
+      <h1>
+        <span class="word"><span style="--i: 0">Un</span></span>
+        <span class="word"><span style="--i: 1">titular</span></span>
+        <span class="word"><span style="--i: 2">que</span></span>
+        <span class="word"><span style="--i: 3">llega</span></span>
+        <span class="word"><span style="--i: 4">después</span></span>
+      </h1>
+      <p>Subtítulo de ejemplo que aparece cuando el marco ya se ha abierto.</p>
+    </div>
+  </section>
+
+<script>
+  // Entrada: las fotos llegan desde fuera, forman un collage y una ocupa la pantalla.
+  const root = document.documentElement;
+  const finishIntro = () => {
+    document.querySelector('.intro')?.remove();
+    root.classList.remove('hero-intro', 'intro-text');
+  };
+
+  const runIntro = async () => {
+    const cards = [...document.querySelectorAll('.intro-card')];
+    const compact = innerWidth < 760;
+    const size = compact ? 0.36 : 0.3;
+    const gapX = compact ? 39 : 34;
+    const gapY = compact ? 37 : 34;
+    // Posiciones del collage en porcentaje del hero; la primera tarjeta, la final, queda en el centro.
+    const layout = [[0, 0], [-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+    const tilts = [0, -4, 3, -2, 3, -3, 2, -2, 4];
+    const placed = (i, spread = 1, scale = size) => {
+      const [x, y] = layout[i];
+      return `translate(${x * gapX * spread}%, ${y * gapY * spread}%) rotate(${tilts[i]}deg) scale(${scale})`;
+    };
+
+    // Espera a las fotos, sin bloquear la página si una tarda demasiado.
+    await Promise.race([
+      Promise.allSettled(cards.map((card) => card.decode())),
+      new Promise((resolve) => setTimeout(resolve, 2500)),
+    ]);
+
+    const arrivals = cards.map((card, i) => {
+      const [x, y] = layout[i];
+      const from = i === 0
+        ? `translate(0, 0) scale(${size * 0.6})`
+        : `translate(${(x || (i % 2 ? 1 : -1)) * 240}%, ${(y || (i % 2 ? -1 : 1)) * 200}%) rotate(${tilts[i] * 4}deg) scale(${size})`;
+      return card.animate(
+        [{ transform: from, opacity: 0 }, { transform: placed(i), opacity: 1 }],
+        { duration: 850, delay: ((i + 8) % 9) * 75, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'both' },
+      );
+    });
+    await Promise.all(arrivals.map((arrival) => arrival.finished));
+
+    // El collage respira un momento antes de abrirse.
+    await Promise.all(cards.map((card, i) => card.animate(
+      [{ transform: placed(i) }, { transform: placed(i, 1.04) }],
+      { duration: 420, easing: 'ease-in-out', fill: 'both' },
+    ).finished));
+
+    // Las demás se van mientras la foto final queda enmarcada. Los colores de los aros van aquí.
+    const framed = `scale(${compact ? 0.55 : 0.46})`;
+    const noRings = '0 0 0 0 #f2f3ef, 0 0 0 0 #f2ab82, 0 0 0 0 #f2f3ef, 0 0 0 0 #f99a62, 0 0 0 0 #f2f3ef, 0 0 0 0 #f99a31';
+    const rings = '0 0 0 12px #f2f3ef, 0 0 0 52px #f2ab82, 0 0 0 64px #f2f3ef, 0 0 0 104px #f99a62, 0 0 0 116px #f2f3ef, 0 0 0 170px #f99a31';
+    const flight = { duration: 950, easing: 'cubic-bezier(0.76, 0, 0.18, 1)', fill: 'both' };
+    const main = cards[0];
+    main.style.zIndex = 2;
+    const departures = cards.map((card, i) => {
+      if (i === 0) {
+        return card.animate(
+          [{ transform: placed(0, 1.04), borderRadius: '42px', boxShadow: noRings }, { transform: framed, borderRadius: '42px', boxShadow: rings }],
+          flight,
+        );
+      }
+      const [x, y] = layout[i];
+      return card.animate(
+        [{ transform: placed(i, 1.04), opacity: 1 }, { transform: `translate(${(x || 1) * 200}%, ${(y || 1) * 200}%) scale(${size})`, opacity: 0 }],
+        flight,
+      );
+    });
+    await Promise.all(departures.map((departure) => departure.finished));
+    cards.slice(1).forEach((card) => card.remove());
+    await new Promise((resolve) => setTimeout(resolve, 280));
+
+    // Los aros se abren hasta salir de la pantalla y la foto se oscurece poco a poco mientras llega el texto.
+    root.classList.add('intro-text');
+    const opening = { duration: 1300, easing: 'cubic-bezier(0.83, 0, 0.17, 1)', fill: 'both' };
+    main.animate(
+      [{ transform: framed, borderRadius: '42px', boxShadow: rings }, { transform: 'none', borderRadius: '0', boxShadow: rings }],
+      opening,
+    );
+    document.querySelector('.intro-shade').animate([{ opacity: 0 }, { opacity: 1 }], opening);
+    await new Promise((resolve) => setTimeout(resolve, 2300));
+    finishIntro();
+  };
+
+  if (root.classList.contains('hero-intro')) {
+    if (scrollY > innerHeight / 2) finishIntro();
+    else runIntro().catch(finishIntro);
+  }
+</script>
+</body>
+</html>

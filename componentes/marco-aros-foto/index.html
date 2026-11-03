@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marco de aros para fotos</title>
+<style>
+  :root {
+    --claro: #f2f3ef;
+    --acento-1: #f99a31;
+    --acento-2: #f99a62;
+    --acento-3: #f2ab82;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { display: grid; place-items: center; min-height: 100svh; margin: 0; padding: 1.5rem; background: var(--claro); }
+  .ejemplo { width: min(100%, 44rem); }
+
+  /* La foto ocupa el hueco central. El separador debe ser del color del fondo de la página. */
+  .ring {
+    --gap: clamp(3px, 0.45vw, 6px);
+    --thick: clamp(10px, 2vw, 26px);
+    --thin: clamp(3px, 0.5vw, 7px);
+    margin: 0;
+    padding: var(--thick) var(--thin) var(--thin) var(--thick);
+    border-radius: 22px;
+  }
+  .ring-1 { background: var(--acento-1); }
+  .ring-2, .ring-3 { border: var(--gap) solid var(--claro); }
+  .ring-2 { background: var(--acento-2); border-radius: 17px; }
+  .ring-3 { background: var(--acento-3); border-radius: 13px; }
+  .ring img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border: var(--gap) solid var(--claro);
+    border-radius: 9px;
+  }
+</style>
+</head>
+<body>
+  <div class="ejemplo">
+    <figure class="ring ring-1">
+      <div class="ring ring-2">
+        <div class="ring ring-3">
+          <img src="https://picsum.photos/seed/marco/1200/750" alt="Foto de ejemplo">
+        </div>
+      </div>
+    </figure>
+  </div>
+</body>
+</html>

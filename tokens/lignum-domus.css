@@ -1,0 +1,36 @@
+/* Tokens sacados de Lignum Domus. Las piezas de la librería usan estos mismos nombres. */
+/* Fuentes: https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap */
+:root {
+  /* Colores */
+  --oscuro: #1c211e;
+  --claro: #f2f3ef;
+  --acento-1: #f99a31;
+  --acento-2: #f99a62;
+  --acento-3: #f2ab82;
+  --apagado: #5d645f;
+  --apagado-sobre-oscuro: #c4c9c4;
+  --etiqueta: #a85a0a;
+  --blanco: #fff;
+
+  /* Fuentes */
+  --display: 'Fraunces', Georgia, serif;
+  --body: 'Instrument Sans', system-ui, sans-serif;
+
+  /* Espaciados */
+  --edge: max(clamp(1.5rem, 6vw, 6rem), calc((100vw - 104rem) / 2));
+  --gutter: clamp(1rem, 4vw, 3.5rem);
+  --space: clamp(7rem, 13vw, 15rem);
+
+  /* Radios */
+  --radio-boton: 9px;
+  --radio-bloque: 14px;
+
+  /* Sombras */
+  --sombra-bloque: 0 1.5rem 3rem rgb(16 19 17 / 0.28);
+  --sombra-miniatura: 0 0.5rem 1.25rem rgb(16 19 17 / 0.3);
+
+  /* Curvas de movimiento */
+  --curva-salida: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --curva-rapida: cubic-bezier(0.16, 1, 0.3, 1);
+  --curva-muelle: cubic-bezier(0.2, 1.35, 0.4, 1);
+}

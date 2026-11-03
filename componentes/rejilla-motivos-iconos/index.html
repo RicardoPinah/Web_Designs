@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rejilla de motivos con iconos</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --oscuro: #1c211e;
+    --acento-1: #f99a31;
+    --apagado: #5d645f;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'Instrument Sans', system-ui, sans-serif;
+    --edge: max(clamp(1.5rem, 6vw, 6rem), calc((100vw - 104rem) / 2));
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: #fff; color: var(--oscuro); font: 400 1.125rem/1.7 var(--body); }
+  h3 { margin: 0; font: 400 clamp(1.25rem, 1.6vw, 1.5rem)/1.2 var(--display); }
+  p { margin: 0; color: var(--apagado); font-size: 1rem; line-height: 1.45; }
+
+  .reason-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(2rem, 4vw, 4rem) clamp(1.5rem, 3vw, 3rem);
+    margin: 0;
+    padding: clamp(4rem, 10vw, 8rem) var(--edge);
+    list-style: none;
+  }
+  .reason-grid li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.25rem 0.85rem; }
+  .reason-icon {
+    grid-row: span 2;
+    width: 2rem;
+    fill: none;
+    stroke: var(--acento-1);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.5;
+  }
+  @media (max-width: 60rem) {
+    .reason-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+</head>
+<body>
+  <ul class="reason-grid">
+    <li><svg class="reason-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v12H3z M9 8V4h6v4 M3 13h18"/></svg><h3>Motivo uno</h3><p>Texto breve de ejemplo.</p></li>
+    <li><svg class="reason-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 1 0 0 12 6 6 0 0 0 0-12z M8.5 14 7 21l5-3 5 3-1.5-7"/></svg><h3>Motivo dos</h3><p>Texto breve de ejemplo.</p></li>
+    <li><svg class="reason-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6 M10 21h4 M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/></svg><h3>Motivo tres</h3><p>Texto breve de ejemplo.</p></li>
+    <li><svg class="reason-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19z M14 7l3 3"/></svg><h3>Motivo cuatro</h3><p>Texto breve de ejemplo.</p></li>
+    <li><svg class="reason-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11 M18 7h3 M3 17h3 M10 17h11 M16 5a2 2 0 1 0 0 4 2 2 0 0 0 0-4z M8 15a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg><h3>Motivo cinco</h3><p>Texto breve de ejemplo.</p></li>
+    <li><svg class="reason-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/></svg><h3>Motivo seis</h3><p>Texto breve de ejemplo.</p></li>
+  </ul>
+</body>
+</html>

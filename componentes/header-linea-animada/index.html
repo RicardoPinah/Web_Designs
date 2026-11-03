@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Header con línea animada</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --oscuro: #1c211e;
+    --acento-1: #f99a31;
+    --blanco: #fff;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'Instrument Sans', system-ui, sans-serif;
+    --edge: max(clamp(1.5rem, 6vw, 6rem), calc((100vw - 104rem) / 2));
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; font: 400 1.0625rem/1.6 var(--body); }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--acento-1); outline-offset: 3px; }
+
+  .site-header {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem 1.5rem;
+    padding: clamp(1.25rem, 2.5vw, 2.25rem) var(--edge);
+    color: var(--blanco);
+    animation: header-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both;
+  }
+  .site-header::after {
+    content: '';
+    position: absolute;
+    right: var(--edge);
+    bottom: 0;
+    left: var(--edge);
+    height: 1px;
+    background: rgb(255 255 255 / 0.4);
+    animation: line-draw 1.2s cubic-bezier(0.76, 0, 0.18, 1) 0.4s both;
+  }
+  @keyframes header-in {
+    from { opacity: 0; transform: translateY(-1rem); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes line-draw {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  .wordmark { font: 1.5rem/1 var(--display); text-decoration: none; white-space: nowrap; }
+  nav { display: flex; flex-wrap: wrap; gap: 0.25rem clamp(1.25rem, 2.5vw, 2.5rem); }
+  nav a {
+    font-weight: 500;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+  }
+  nav a:hover { text-decoration-color: currentColor; }
+  nav a[aria-current] { text-decoration-color: var(--acento-1); }
+
+  .ejemplo-hero { min-height: 100svh; background: var(--oscuro); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-header, .site-header::after { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="wordmark" href="#">Tu Marca</a>
+    <nav aria-label="Principal">
+      <a href="#" aria-current="page">Inicio</a>
+      <a href="#">Servicios</a>
+      <a href="#">Proyectos</a>
+      <a href="#">Contacto</a>
+    </nav>
+  </header>
+  <div class="ejemplo-hero"></div>
+</body>
+</html>

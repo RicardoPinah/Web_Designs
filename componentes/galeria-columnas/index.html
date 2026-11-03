@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galería en columnas</title>
+<style>
+  body { margin: 0; padding: clamp(1rem, 4vw, 3.5rem); background: #f2f3ef; color: #1c211e; font: 400 1.0625rem/1.6 system-ui, sans-serif; }
+
+  .gallery { columns: 3 18rem; column-gap: clamp(1rem, 2vw, 1.5rem); }
+  figure { break-inside: avoid; margin: 0 0 clamp(1rem, 2vw, 1.5rem); }
+  img { display: block; width: 100%; height: auto; border-radius: 9px; }
+  figcaption { margin-top: 0.5rem; color: #5d645f; }
+</style>
+</head>
+<body>
+  <div class="gallery">
+    <figure><img src="https://picsum.photos/seed/galeria-1/800/1000" alt="Foto de ejemplo 1" loading="lazy"><figcaption>Pie de foto</figcaption></figure>
+    <figure><img src="https://picsum.photos/seed/galeria-2/800/600" alt="Foto de ejemplo 2" loading="lazy"><figcaption>Pie de foto</figcaption></figure>
+    <figure><img src="https://picsum.photos/seed/galeria-3/800/800" alt="Foto de ejemplo 3" loading="lazy"><figcaption>Pie de foto</figcaption></figure>
+    <figure><img src="https://picsum.photos/seed/galeria-4/800/1100" alt="Foto de ejemplo 4" loading="lazy"><figcaption>Pie de foto</figcaption></figure>
+    <figure><img src="https://picsum.photos/seed/galeria-5/800/550" alt="Foto de ejemplo 5" loading="lazy"><figcaption>Pie de foto</figcaption></figure>
+    <figure><img src="https://picsum.photos/seed/galeria-6/800/900" alt="Foto de ejemplo 6" loading="lazy"><figcaption>Pie de foto</figcaption></figure>
+  </div>
+</body>
+</html>

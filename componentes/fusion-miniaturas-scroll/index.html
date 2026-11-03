@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fusión de miniaturas con scroll</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --oscuro: #1c211e;
+    --claro: #f2f3ef;
+    --apagado: #5d645f;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'Instrument Sans', system-ui, sans-serif;
+    --edge: max(clamp(1.5rem, 6vw, 6rem), calc((100vw - 104rem) / 2));
+    --thumb-h: clamp(2.75rem, 5.5vw, 6rem);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { position: relative; margin: 0; background: var(--claro); color: var(--oscuro); font: 400 1.125rem/1.7 var(--body); overflow-x: clip; }
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  h1, h2 { margin: 0; font-family: var(--display); font-weight: 400; line-height: 1.15; }
+  h1 { font-size: clamp(2.375rem, 5vw, 5.75rem); }
+  h2 { font-size: clamp(2.125rem, 1.6rem + 1.9vw, 3.625rem); }
+  p { margin: 0; color: var(--apagado); }
+
+  .hero { position: relative; display: grid; place-items: center; min-height: 100svh; padding: var(--edge); background: var(--oscuro); color: var(--claro); text-align: center; }
+  .hero-thumbs {
+    position: absolute;
+    right: var(--edge);
+    bottom: clamp(0.75rem, 2svh, 1.25rem);
+    left: var(--edge);
+    display: flex;
+    justify-content: center;
+    gap: clamp(0.35rem, 0.8vw, 0.85rem);
+  }
+  .thumb { flex: 0 1 calc(var(--thumb-h) * 16 / 9); min-width: 0; height: var(--thumb-h); overflow: hidden; border-radius: 10px; }
+
+  .merge { position: absolute; top: 0; left: 0; z-index: 5; width: 0; height: 0; pointer-events: none; visibility: hidden; }
+  .merge-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    border-radius: 10px;
+    box-shadow: 0 0.75rem 2rem rgb(16 19 17 / 0.4);
+    transform-origin: center;
+    will-change: transform, width, height;
+  }
+  .merge-final { opacity: 0; }
+
+  .destino {
+    display: grid;
+    grid-template-columns: minmax(0, 11fr) minmax(0, 12fr);
+    align-items: center;
+    gap: clamp(3.5rem, 7vw, 8rem);
+    min-height: 100svh;
+    padding: var(--edge);
+  }
+  .destino-foto { aspect-ratio: 5 / 4; height: auto; border-radius: 9px; }
+  .destino-texto { display: grid; gap: 1.6rem; }
+  .relleno { min-height: 60vh; }
+  @media (max-width: 60rem) {
+    .destino { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+</head>
+<body>
+  <section class="hero">
+    <h1>Baja y mira las miniaturas</h1>
+    <div class="hero-thumbs">
+      <div class="thumb"><img src="https://picsum.photos/seed/mini-1/640/360" alt=""></div>
+      <div class="thumb"><img src="https://picsum.photos/seed/mini-2/640/360" alt=""></div>
+      <div class="thumb"><img src="https://picsum.photos/seed/mini-3/640/360" alt=""></div>
+      <div class="thumb"><img src="https://picsum.photos/seed/mini-4/640/360" alt=""></div>
+      <div class="thumb"><img src="https://picsum.photos/seed/mini-5/640/360" alt=""></div>
+      <div class="thumb"><img src="https://picsum.photos/seed/mini-6/640/360" alt=""></div>
+    </div>
+  </section>
+
+  <!-- Una copia de cada miniatura, en el mismo orden, y al final la foto de destino. -->
+  <div class="merge" aria-hidden="true">
+    <img class="merge-card" src="https://picsum.photos/seed/mini-1/640/360" alt="">
+    <img class="merge-card" src="https://picsum.photos/seed/mini-2/640/360" alt="">
+    <img class="merge-card" src="https://picsum.photos/seed/mini-3/640/360" alt="">
+    <img class="merge-card" src="https://picsum.photos/seed/mini-4/640/360" alt="">
+    <img class="merge-card" src="https://picsum.photos/seed/mini-5/640/360" alt="">
+    <img class="merge-card" src="https://picsum.photos/seed/mini-6/640/360" alt="">
+    <img class="merge-card merge-final" src="https://picsum.photos/seed/destino/1000/800" alt="">
+  </div>
+
+  <section class="destino">
+    <img class="destino-foto" src="https://picsum.photos/seed/destino/1000/800" alt="Foto de ejemplo">
+    <div class="destino-texto">
+      <h2>La foto que recibe a las miniaturas</h2>
+      <p>Texto de ejemplo de la sección siguiente.</p>
+    </div>
+  </section>
+  <div class="relleno"></div>
+
+<script>
+  // Al bajar del hero, las miniaturas se juntan, se fusionan en una y viajan hasta la foto de la sección siguiente.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const layer = document.querySelector('.merge');
+    const clones = [...layer.children];
+    const thumbs = [...document.querySelectorAll('.thumb')];
+    const thumbRow = document.querySelector('.hero-thumbs');
+    const image = document.querySelector('.destino-foto');
+    const clamp = (value) => Math.max(0, Math.min(value, 1));
+    const ease = (t) => t * t * (3 - 2 * t);
+    const mix = (from, to, t) => from + (to - from) * t;
+    const place = (from, to, t) => ({
+      x: mix(from.x, to.x, t),
+      y: mix(from.y, to.y, t),
+      w: mix(from.w, to.w, t),
+      h: mix(from.h, to.h, t),
+    });
+    let starts = [];
+    let hub;
+    let goal;
+    let end = 1;
+    let shown = 0;
+    let wanted = 0;
+    let moving = false;
+    let time = 0;
+
+    const measure = () => {
+      const box = (element) => {
+        const { left, top, width, height } = element.getBoundingClientRect();
+        return { x: left + scrollX, y: top + scrollY, w: width, h: height };
+      };
+      starts = thumbs.map(box);
+      goal = box(image);
+      // Termina cuando la foto de destino ya está bien dentro de la pantalla.
+      end = Math.max(goal.y - innerHeight * 0.2, 1);
+      const row = box(thumbRow);
+      const w = starts[0].w * 1.2;
+      const h = starts[0].h * 1.2;
+      hub = { x: row.x + row.w / 2 - w / 2, y: row.y + row.h / 2 - h / 2, w, h };
+      starts.push(hub);
+    };
+
+    const draw = (p) => {
+      const idle = p <= 0.002 || p >= 0.998;
+      layer.style.visibility = idle ? 'hidden' : 'visible';
+      thumbRow.style.visibility = p <= 0.002 ? 'visible' : 'hidden';
+      image.style.opacity = p >= 0.998 ? '' : 0;
+      if (idle) return;
+
+      // Primero se juntan abanicándose; después el bloque único viaja y crece.
+      const gather = ease(clamp(p / 0.42));
+      const travel = ease(clamp((p - 0.42) / 0.56));
+      const pulse = Math.sin(clamp((p - 0.34) / 0.16) * Math.PI);
+      clones.forEach((clone, i) => {
+        const at = place(place(starts[i], hub, gather), goal, travel);
+        const spin = (i - 2.5) * 5 * Math.sin(gather * Math.PI);
+        const isFinal = i === clones.length - 1;
+        const scale = 1 + pulse * 0.08;
+        clone.style.width = `${at.w}px`;
+        clone.style.height = `${at.h}px`;
+        clone.style.transform = `translate(${at.x}px, ${at.y}px) rotate(${isFinal ? 0 : spin}deg) scale(${scale})`;
+        clone.style.opacity = isFinal ? clamp((p - 0.36) / 0.12) : 1 - clamp((p - 0.48) / 0.05);
+        clone.style.borderRadius = `${mix(10, 9, travel)}px`;
+        clone.style.filter = isFinal ? 'none' : `brightness(${mix(0.72, 1, gather)})`;
+      });
+    };
+
+    // El suavizado depende del tiempo y no de los fotogramas, para que vaya igual en equipos lentos.
+    const smoothing = (rate, previous, now) => 1 - Math.exp(-rate * Math.min(now - previous, 200) / 1000);
+    const step = (now) => {
+      shown += (wanted - shown) * smoothing(10.5, time || now - 16, now);
+      time = now;
+      if (Math.abs(wanted - shown) < 0.001) shown = wanted;
+      draw(shown);
+      if (shown === wanted) {
+        moving = false;
+        time = 0;
+      } else requestAnimationFrame(step);
+    };
+    const follow = () => {
+      wanted = clamp(scrollY / end);
+      if (!moving) {
+        moving = true;
+        requestAnimationFrame(step);
+      }
+    };
+    const refresh = () => {
+      measure();
+      draw(shown);
+      follow();
+    };
+
+    addEventListener('scroll', follow, { passive: true });
+    addEventListener('resize', refresh);
+    addEventListener('load', refresh);
+    document.fonts.ready.then(refresh);
+    refresh();
+    shown = wanted;
+    draw(shown);
+  }
+</script>
+</body>
+</html>

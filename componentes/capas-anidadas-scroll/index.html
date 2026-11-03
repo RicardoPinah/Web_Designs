@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capas anidadas con scroll</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --oscuro: #1c211e;
+    --claro: #f2f3ef;
+    --acento-1: #f99a31;
+    --acento-2: #f99a62;
+    --acento-3: #f2ab82;
+    --apagado: #5d645f;
+    --etiqueta: #a85a0a;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'Instrument Sans', system-ui, sans-serif;
+    --edge: max(clamp(1.5rem, 6vw, 6rem), calc((100vw - 104rem) / 2));
+    --space: clamp(7rem, 13vw, 15rem);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: var(--claro); color: var(--oscuro); font: 400 1.125rem/1.7 var(--body); }
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  h2 { margin: 0; font: 400 clamp(2.125rem, 1.6rem + 1.9vw, 3.625rem)/1.15 var(--display); text-wrap: balance; }
+  p { margin: 0; max-width: 62ch; }
+  .relleno { display: grid; place-items: center; min-height: 70vh; color: var(--apagado); }
+  .eyebrow { color: var(--etiqueta); font-size: 0.95rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* Cada capa sube dentro de la anterior y el texto cambia al lado. */
+  .layers-stage {
+    display: grid;
+    grid-template-columns: minmax(0, 11fr) minmax(0, 12fr);
+    align-items: center;
+    gap: clamp(3.5rem, 7vw, 8rem);
+    padding: var(--space) var(--edge);
+  }
+  .layer {
+    --ring-top: clamp(0.6rem, 1.8vw, 2.25rem);
+    --ring-side: clamp(0.7rem, 2.6vw, 3rem);
+    --ring-thin: clamp(0.2rem, 0.4vw, 0.45rem);
+    --gap: clamp(0.2rem, 0.35vw, 0.4rem);
+    padding: var(--ring-top) var(--ring-thin) var(--ring-thin) var(--ring-side);
+    border-radius: clamp(0.9rem, 1.6vw, 1.6rem);
+  }
+  .layer-a { background: var(--acento-1); }
+  .layer-b { margin: var(--gap); background: var(--acento-2); }
+  .layer-c { margin: var(--gap); background: var(--acento-3); }
+  .layer-inner { position: relative; overflow: hidden; background: var(--claro); border-radius: clamp(0.6rem, 1.1vw, 1.1rem); }
+  .layer-photo { aspect-ratio: 5 / 4; height: auto; }
+  .layer-texts { display: grid; gap: 3rem; }
+  .layer-text { display: grid; justify-items: start; align-content: center; gap: 1.6rem; }
+  .layer-text p:not(.eyebrow) { color: var(--apagado); }
+
+  /* Con animación, la sección queda fija mientras cambian imagen y texto. */
+  .layers.is-pinned { --tb: 0; --tc: 0; height: calc(100svh + 2 * 120svh); }
+  .is-pinned .layers-stage { position: sticky; top: 0; height: 100svh; padding-block: clamp(1rem, 4svh, 3rem); }
+  .is-pinned .rings { width: 100%; max-height: 100%; aspect-ratio: 5 / 4; }
+  .is-pinned .rings .layer-a, .is-pinned .rings .layer-inner { height: 100%; }
+  .is-pinned .layer-photo { position: absolute; inset: var(--gap); width: calc(100% - 2 * var(--gap)); height: calc(100% - 2 * var(--gap)); aspect-ratio: auto; border-radius: clamp(0.45rem, 0.8vw, 0.8rem); }
+  .is-pinned .layer-b, .is-pinned .layer-c { position: absolute; inset: var(--gap); z-index: 1; margin: 0; }
+  .is-pinned .layer-b { transform: translateY(calc((1 - var(--tb)) * 106%)); }
+  .is-pinned .layer-c { transform: translateY(calc((1 - var(--tc)) * 106%)); }
+  /* Que la foto de la capa anterior no asome por el hueco entre aros: se rellena y se oculta al quedar cubierta. */
+  .is-pinned .layer-b, .is-pinned .layer-c { box-shadow: 0 0 0 calc(var(--gap) + 1px) var(--claro); }
+  .is-pinned .layer-a > .layer-inner > .layer-photo { opacity: calc((1 - var(--tb)) * 50); }
+  .is-pinned .layer-b > .layer-inner > .layer-photo { opacity: calc((1 - var(--tc)) * 50); transform: scale(calc(1.14 - var(--tb) * 0.14)); }
+  .is-pinned .layer-c > .layer-inner > .layer-photo { transform: scale(calc(1.14 - var(--tc) * 0.14)); }
+  .is-pinned .layer-texts { gap: 0; }
+  .is-pinned .layer-text { grid-area: 1 / 1; }
+  .is-pinned .text-a { opacity: calc(1 - var(--tb) * 2); transform: translateY(calc(var(--tb) * -1.5rem)); }
+  .is-pinned .text-b { opacity: min(calc(var(--tb) * 2 - 1), calc(1 - var(--tc) * 2)); transform: translateY(calc((1 - var(--tb)) * 1.5rem - var(--tc) * 1.5rem)); }
+  .is-pinned .text-c { opacity: calc(var(--tc) * 2 - 1); transform: translateY(calc((1 - var(--tc)) * 1.5rem)); }
+
+  @media (max-width: 60rem) {
+    .layers-stage { grid-template-columns: minmax(0, 1fr); gap: clamp(1.25rem, 3svh, 2.5rem); }
+    .is-pinned .layers-stage { grid-template-rows: auto minmax(0, 1fr); align-items: start; }
+    .is-pinned .rings { aspect-ratio: 4 / 3; }
+    .layer-text { gap: 0.85rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="relleno">Baja para ver las capas</div>
+
+  <section class="layers" aria-label="Nuestra historia">
+    <div class="layers-stage">
+      <div class="rings">
+        <div class="layer layer-a">
+          <div class="layer-inner">
+            <img class="layer-photo" src="https://picsum.photos/seed/capa-a/1000/800" alt="Foto de ejemplo 1">
+            <div class="layer layer-b">
+              <div class="layer-inner">
+                <img class="layer-photo" src="https://picsum.photos/seed/capa-b/1000/800" alt="Foto de ejemplo 2">
+                <div class="layer layer-c">
+                  <div class="layer-inner">
+                    <img class="layer-photo" src="https://picsum.photos/seed/capa-c/1000/800" alt="Foto de ejemplo 3">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="layer-texts">
+        <div class="layer-text text-a">
+          <p class="eyebrow">Primera etiqueta</p>
+          <h2>Título de la primera capa</h2>
+          <p>Texto de ejemplo que acompaña a la primera foto.</p>
+        </div>
+        <div class="layer-text text-b">
+          <p class="eyebrow">Segunda etiqueta</p>
+          <h2>Título de la segunda capa</h2>
+          <p>Texto de ejemplo que acompaña a la segunda foto.</p>
+        </div>
+        <div class="layer-text text-c">
+          <p class="eyebrow">Tercera etiqueta</p>
+          <h2>Título de la tercera capa</h2>
+          <p>Texto de ejemplo que acompaña a la tercera foto.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="relleno">Fin de la sección</div>
+
+<script>
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const layers = document.querySelector('.layers');
+    const textB = document.querySelector('.text-b');
+    const textC = document.querySelector('.text-c');
+    const clamp = (value) => Math.max(0, Math.min(value, 1));
+    const ease = (t) => t * t * (3 - 2 * t);
+    let shown = 0;
+    let wanted = 0;
+    let moving = false;
+    let time = 0;
+
+    // Las capas se encajan una dentro de otra con el scroll: primero la segunda y luego la tercera.
+    layers.classList.add('is-pinned');
+    const draw = (p) => {
+      const b = ease(clamp((p - 0.1) / 0.36));
+      const c = ease(clamp((p - 0.58) / 0.36));
+      layers.style.setProperty('--tb', b);
+      layers.style.setProperty('--tc', c);
+      textB.inert = b < 0.5 || c >= 0.5;
+      textC.inert = c < 0.5;
+    };
+    // El suavizado depende del tiempo y no de los fotogramas, para que vaya igual en equipos lentos.
+    const smoothing = (rate, previous, now) => 1 - Math.exp(-rate * Math.min(now - previous, 200) / 1000);
+    const step = (now) => {
+      shown += (wanted - shown) * smoothing(9, time || now - 16, now);
+      time = now;
+      if (Math.abs(wanted - shown) < 0.0005) shown = wanted;
+      draw(shown);
+      if (shown === wanted) {
+        moving = false;
+        time = 0;
+      } else requestAnimationFrame(step);
+    };
+    const follow = () => {
+      const { top, height } = layers.getBoundingClientRect();
+      wanted = clamp(-top / (height - innerHeight));
+      if (!moving) {
+        moving = true;
+        requestAnimationFrame(step);
+      }
+    };
+    addEventListener('scroll', follow, { passive: true });
+    addEventListener('resize', follow);
+    draw(0);
+    follow();
+  }
+</script>
+</body>
+</html>

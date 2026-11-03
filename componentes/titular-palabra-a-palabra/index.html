@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Titular palabra a palabra</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --oscuro: #1c211e;
+    --blanco: #fff;
+    --display: 'Fraunces', Georgia, serif;
+  }
+  body { display: grid; place-items: center; min-height: 100svh; margin: 0; padding: 2rem; background: var(--oscuro); color: var(--blanco); text-align: center; }
+  h1 {
+    max-width: 19em;
+    margin: 0;
+    font: 400 clamp(2.375rem, 5vw, 5.75rem)/1.12 var(--display);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  /* El titular sube palabra a palabra desde detrás de una máscara. */
+  .word { display: inline-block; overflow: hidden; vertical-align: top; }
+  .word > span {
+    display: inline-block;
+    animation: word-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(0.55s + var(--i) * 70ms) both;
+  }
+  @keyframes word-rise {
+    from { transform: translateY(110%); }
+    to { transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .word > span { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <h1>
+    <span class="word"><span style="--i: 0">Cada</span></span>
+    <span class="word"><span style="--i: 1">palabra</span></span>
+    <span class="word"><span style="--i: 2">sube</span></span>
+    <span class="word"><span style="--i: 3">desde</span></span>
+    <span class="word"><span style="--i: 4">su</span></span>
+    <span class="word"><span style="--i: 5">máscara</span></span>
+  </h1>
+</body>
+</html>
