@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tarjeta con sombra dura</title>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fondo: #CFE6F7; --superficie: #FFFFFF; --borde: #1D2B53; --texto: #1D2B53; --apagado: #4F5D80; --sombra: #1D2B53;
+    --grosor: 2px; --radio: 14px;
+  }
+  /* De noche: contorno claro y sombra rosa */
+  @media (prefers-color-scheme: dark) {
+    :root { --fondo: #121A33; --superficie: #1E2A4D; --borde: #EAF2FF; --texto: #EAF2FF; --apagado: #9DABC9; --sombra: #FF8FAB; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100svh; padding: 32px 20px;
+    background: var(--fondo); color: var(--texto);
+    font-family: 'M PLUS Rounded 1c', system-ui, sans-serif; font-weight: 500; line-height: 1.5;
+  }
+  .ejemplo { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+  .tarjeta {
+    display: block; padding: 14px; border-radius: var(--radio);
+    background: var(--superficie); color: var(--texto); text-decoration: none;
+    border: var(--grosor) solid var(--borde); box-shadow: 4px 4px 0 var(--sombra);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  /* Si es un enlace, se levanta al pasar por encima */
+  a.tarjeta:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--sombra); }
+
+  .tarjeta h2 { margin: 0 0 4px; font-size: 17px; font-weight: 800; }
+  .tarjeta p { margin: 0; color: var(--apagado); font-size: 14px; }
+</style>
+</head>
+<body>
+  <div class="ejemplo">
+    <div class="tarjeta">
+      <h2>Tarjeta normal</h2>
+      <p>Contorno de 2 px y sombra dura desplazada, como una viñeta.</p>
+    </div>
+    <a class="tarjeta" href="#">
+      <h2>Tarjeta con enlace</h2>
+      <p>Pasa por encima: se levanta y la sombra crece.</p>
+    </a>
+  </div>
+</body>
+</html>

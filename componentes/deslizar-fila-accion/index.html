@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deslizar una fila</title>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fondo: #CFE6F7; --superficie: #FFFFFF; --borde: #1D2B53; --texto: #1D2B53; --apagado: #4F5D80; --acento: #FFD23F; --sobre-acento: #1D2B53; --sombra: #1D2B53;
+    --grosor: 2px; --radio: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --fondo: #121A33; --superficie: #1E2A4D; --borde: #EAF2FF; --texto: #EAF2FF; --apagado: #9DABC9; --sobre-acento: #121A33; --sombra: #FF8FAB; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100svh; padding: 32px 20px;
+    background: var(--fondo); color: var(--texto);
+    font-family: 'M PLUS Rounded 1c', system-ui, sans-serif; font-weight: 500;
+  }
+  .ejemplo { max-width: 480px; margin: 0 auto; }
+
+  /* Filas que se deslizan a la derecha: al lado aparece una franja con lo que va a pasar */
+  .deslizable { overflow-x: clip; }
+  .deslizable [data-deslizar] { touch-action: pan-y; position: relative; transition: transform 0.2s ease; user-select: none; }
+  .deslizable [data-deslizar].deslizando { transition: none; }
+  .deslizar-marca {
+    position: absolute; top: calc(-1 * var(--grosor)); bottom: calc(-1 * var(--grosor)); right: calc(100% + var(--grosor));
+    width: 100vw; display: flex; align-items: center; justify-content: flex-end; padding-right: 16px;
+    background: var(--superficie); color: var(--texto); border: var(--grosor) solid var(--borde); border-radius: var(--radio);
+    font-weight: 800; font-size: 16px; pointer-events: none;
+  }
+  /* Pasado el punto en que se hace, se vuelve amarilla */
+  .deslizar-listo .deslizar-marca { background: var(--acento); color: var(--sobre-acento); }
+
+  /* Solo para el ejemplo */
+  .filas { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0 6px 6px 0; list-style: none; }
+  .filas li {
+    padding: 14px; border-radius: var(--radio); background: var(--superficie);
+    border: var(--grosor) solid var(--borde); box-shadow: 4px 4px 0 var(--sombra); font-weight: 800;
+  }
+  .filas .detalle { display: block; color: var(--apagado); font-size: 13px; font-weight: 500; }
+  #mensaje { min-height: 24px; }
+</style>
+</head>
+<body>
+  <div class="ejemplo">
+    <p>Desliza una fila hacia la derecha, con el dedo o con el ratón.</p>
+    <ul class="filas" id="filas">
+      <li data-deslizar="1">Primer elemento<span class="detalle">Una línea de descripción</span></li>
+      <li data-deslizar="2">Segundo elemento<span class="detalle">Una línea de descripción</span></li>
+      <li data-deslizar="3">Tercer elemento<span class="detalle">Una línea de descripción</span></li>
+    </ul>
+    <p id="mensaje" role="status"></p>
+  </div>
+
+<script>
+  // A partir de cuántos píxeles se hace la acción al soltar
+  const UMBRAL_DESLIZAR = 90;
+
+  // Convierte cada [data-deslizar] del contenedor en una fila deslizable. Con { conRaton: true }
+  // funciona también con el ratón; si no, solo con el dedo.
+  function activarDeslizar(contenedor, { texto, alDeslizar, conRaton = false }) {
+    contenedor.classList.add('deslizable');
+    let fila = null;
+    let puntero = null;
+    let x0 = 0;
+    let y0 = 0;
+    let dx = 0;
+    let direccion = null;
+    let saltarClic = false;
+
+    contenedor.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && !conRaton) return;
+      fila = e.target.closest('[data-deslizar]');
+      if (!fila) return;
+      puntero = e.pointerId;
+      x0 = e.clientX;
+      y0 = e.clientY;
+      dx = 0;
+      direccion = null;
+    });
+    contenedor.addEventListener('pointermove', (e) => {
+      if (!fila || e.pointerId !== puntero) return;
+      const mx = e.clientX - x0;
+      const my = e.clientY - y0;
+      if (!direccion) {
+        if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;
+        direccion = mx > 0 && Math.abs(mx) > Math.abs(my) ? 'derecha' : 'otra';
+        if (direccion === 'otra') { fila = null; return; }
+        if (!fila.querySelector('.deslizar-marca')) {
+          const marca = document.createElement('span');
+          marca.className = 'deslizar-marca';
+          marca.setAttribute('aria-hidden', 'true');
+          marca.textContent = texto;
+          fila.prepend(marca);
+        }
+        fila.classList.add('deslizando');
+        contenedor.setPointerCapture(e.pointerId);
+      }
+      dx = Math.max(0, mx);
+      fila.style.transform = `translateX(${Math.min(dx, 150)}px)`;
+      fila.classList.toggle('deslizar-listo', dx > UMBRAL_DESLIZAR);
+    });
+    const soltar = (e) => {
+      if (!fila || e.pointerId !== puntero) return;
+      const f = fila;
+      fila = null;
+      if (direccion !== 'derecha') return;
+      // El clic que viene justo después de soltar no debe abrir el enlace de la fila
+      saltarClic = true;
+      setTimeout(() => { saltarClic = false; }, 500);
+      const listo = e.type === 'pointerup' && dx > UMBRAL_DESLIZAR;
+      f.style.transform = '';
+      f.classList.remove('deslizar-listo', 'deslizando');
+      if (listo) {
+        navigator.vibrate?.(15);
+        alDeslizar(f.dataset.deslizar, f);
+      }
+    };
+    contenedor.addEventListener('pointerup', soltar);
+    contenedor.addEventListener('pointercancel', soltar);
+    contenedor.addEventListener('click', (e) => {
+      if (!saltarClic) return;
+      saltarClic = false;
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
+  }
+
+  // Solo para el ejemplo
+  activarDeslizar(document.getElementById('filas'), {
+    texto: 'Añadir',
+    conRaton: true,
+    alDeslizar: (id) => { document.getElementById('mensaje').textContent = `Añadido el elemento ${id}`; },
+  });
+</script>
+</body>
+</html>

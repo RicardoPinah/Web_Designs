@@ -13,6 +13,7 @@ Librería personal de diseños reutilizables.
 | Archivo | Proyecto | Qué es |
 | --- | --- | --- |
 | [lignum-domus.css](tokens/lignum-domus.css) | Lignum Domus | Naranjas, madera oscura y cal, Fraunces e Instrument Sans, espaciados, sombras y curvas de movimiento. |
+| [otakurecs.css](tokens/otakurecs.css) | OtakuRecs | Estilo «Cel»: cielo, amarillo y rosa, tres temas, M PLUS Rounded 1c, contornos y sombras duras. |
 
 ### Componentes
 
@@ -34,6 +35,17 @@ Librería personal de diseños reutilizables.
 | [rejilla-motivos-iconos](componentes/rejilla-motivos-iconos) | Lignum Domus | Rejilla de seis motivos con iconos SVG de línea. |
 | [lista-reglas-acento](componentes/lista-reglas-acento) | Lignum Domus | Lista de definiciones separada por líneas de color. |
 | [galeria-columnas](componentes/galeria-columnas) | Lignum Domus | Galería tipo masonry solo con columnas CSS. |
+| [fondo-cielo-nubes-estrellas](componentes/fondo-cielo-nubes-estrellas) | OtakuRecs | Fondo SVG sin archivos externos, con nubes de día y estrellas de noche. |
+| [tarjeta-contorno-sombra-dura](componentes/tarjeta-contorno-sombra-dura) | OtakuRecs | Tarjeta de dibujo animado con contorno y sombra dura, que se levanta si es un enlace. |
+| [boton-que-se-hunde](componentes/boton-que-se-hunde) | OtakuRecs | Botón amarillo que se hunde en su sombra al pulsarlo, con varias variantes. |
+| [panel-titulo-pastilla](componentes/panel-titulo-pastilla) | OtakuRecs | Sección en recuadro con el título y el enlace en pastillas montadas sobre el borde. |
+| [portada-etiqueta-formato](componentes/portada-etiqueta-formato) | OtakuRecs | Portada 5:7 con etiqueta, fundido al cargar y zoom al pasar por encima. |
+| [barra-inferior-flotante](componentes/barra-inferior-flotante) | OtakuRecs | Barra de navegación en pastilla, separada del borde, con la pestaña activa en amarillo. |
+| [hoja-inferior-arrastrable](componentes/hoja-inferior-arrastrable) | OtakuRecs | Ventana que sube desde abajo y se cierra arrastrando el asa. |
+| [toast-deshacer](componentes/toast-deshacer) | OtakuRecs | Aviso flotante con botón «Deshacer». |
+| [deslizar-fila-accion](componentes/deslizar-fila-accion) | OtakuRecs | Deslizar una fila a la derecha para hacer una acción, con una franja que avisa. |
+| [esqueletos-carga](componentes/esqueletos-carga) | OtakuRecs | Huecos grises que laten con la forma de lo que va a salir. |
+| [animaciones-entrada-escalonada](componentes/animaciones-entrada-escalonada) | OtakuRecs | Animaciones cortas: entrada en cascada, fundido entre páginas, rebote y barra que se rellena. |
 
 ### Páginas y secciones
 

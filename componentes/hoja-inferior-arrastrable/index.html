@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoja inferior arrastrable</title>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fondo: #CFE6F7; --superficie: #FFFFFF; --borde: #1D2B53; --texto: #1D2B53; --acento: #FFD23F; --sobre-acento: #1D2B53; --sombra: #1D2B53;
+    --grosor: 2px; --radio-control: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --fondo: #121A33; --superficie: #1E2A4D; --borde: #EAF2FF; --texto: #EAF2FF; --sobre-acento: #121A33; --sombra: #FF8FAB; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100svh; padding: 32px 20px;
+    background: var(--fondo); color: var(--texto);
+    font-family: 'M PLUS Rounded 1c', system-ui, sans-serif; font-weight: 500; line-height: 1.5;
+  }
+
+  /* El fondo se oscurece y la hoja sube desde abajo */
+  .capa {
+    position: fixed; inset: 0; z-index: 50; background: rgba(13, 20, 40, 0.6);
+    display: flex; align-items: flex-end; justify-content: center;
+    animation: fundido 0.2s ease-out;
+  }
+  .hoja {
+    width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto;
+    padding: 12px 20px 28px; border-radius: 24px 24px 0 0; background: var(--superficie);
+    border: var(--grosor) solid var(--borde); border-bottom: 0;
+    display: flex; flex-direction: column; gap: 14px;
+    animation: subir-hoja 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+  .hoja h2 { margin: 0; font-size: 22px; font-weight: 800; }
+  .hoja p { margin: 0; }
+
+  /* El asa: una rayita, pero la zona para arrastrar es toda la franja de arriba de la hoja */
+  .hoja-asa {
+    align-self: stretch; position: relative; flex-shrink: 0;
+    height: 30px; margin: -12px -20px -8px; touch-action: none; cursor: grab;
+  }
+  .hoja-asa::before {
+    content: ""; position: absolute; left: 50%; top: 12px; width: 44px; height: 5px; margin-left: -22px;
+    border-radius: 999px; background: var(--borde);
+  }
+  .hoja-asa:active { cursor: grabbing; }
+
+  /* En pantallas grandes, y con { centrada: true }, sale en el centro */
+  .capa.centrada { align-items: center; padding: 16px; }
+  .capa.centrada .hoja { border: var(--grosor) solid var(--borde); border-radius: 24px; box-shadow: 6px 6px 0 var(--sombra); max-height: 86vh; animation: escalar-hoja 0.2s ease-out; }
+  .capa.centrada .hoja-asa { display: none; }
+  @media (min-width: 560px) {
+    .capa { align-items: center; }
+    .hoja { border: var(--grosor) solid var(--borde); border-radius: 24px; box-shadow: 6px 6px 0 var(--sombra); animation: escalar-hoja 0.2s ease-out; }
+  }
+
+  @keyframes fundido { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes subir-hoja { from { transform: translateY(100%); } to { transform: none; } }
+  @keyframes escalar-hoja { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .capa, .hoja, .capa.centrada .hoja { animation: none; }
+  }
+
+  /* Solo para el ejemplo */
+  .boton {
+    height: 48px; padding: 0 18px; border-radius: var(--radio-control);
+    border: var(--grosor) solid var(--borde); background: var(--acento); color: var(--sobre-acento);
+    font: inherit; font-weight: 800; cursor: pointer; box-shadow: 3px 3px 0 var(--sombra);
+  }
+  .botones { display: flex; flex-wrap: wrap; gap: 12px; }
+</style>
+</head>
+<body>
+  <div class="botones">
+    <button class="boton" type="button" id="normal">Abrir hoja</button>
+    <button class="boton" type="button" id="fuera">Se cierra al tocar fuera</button>
+    <button class="boton" type="button" id="centrada">Centrada</button>
+  </div>
+
+<script>
+  // El asa de arriba de la hoja se arrastra hacia abajo: si se baja lo suficiente
+  // (o rápido), la hoja se cierra; si no, vuelve a su sitio.
+  function arrastrarParaCerrar(capa, cerrar) {
+    let hoja = null;
+    let inicioY = 0;
+    let bajada = 0;
+    let momento = 0;
+    capa.addEventListener('pointerdown', (e) => {
+      if (!e.target.closest('.hoja-asa')) return;
+      hoja = e.target.closest('.hoja');
+      inicioY = e.clientY;
+      bajada = 0;
+      momento = performance.now();
+      hoja.style.transition = 'none';
+      e.target.closest('.hoja-asa').setPointerCapture(e.pointerId);
+    });
+    capa.addEventListener('pointermove', (e) => {
+      if (!hoja) return;
+      bajada = Math.max(0, e.clientY - inicioY);
+      hoja.style.transform = `translateY(${bajada}px)`;
+    });
+    const soltar = () => {
+      if (!hoja) return;
+      const rapido = bajada / Math.max(1, performance.now() - momento) > 0.6;
+      hoja.style.transition = 'transform 0.2s ease';
+      if (bajada > 100 || (rapido && bajada > 30)) {
+        hoja.style.transform = 'translateY(110%)';
+        setTimeout(cerrar, 180);
+      } else {
+        hoja.style.transform = '';
+      }
+      hoja = null;
+    };
+    capa.addEventListener('pointerup', soltar);
+    capa.addEventListener('pointercancel', soltar);
+  }
+
+  // Con { cerrarFuera: true }, tocar fuera de la hoja la cierra. Con { centrada: true } sale en el
+  // centro de la pantalla también en el móvil. Al cerrarse avisa con el evento «cerrada».
+  function abrirHoja(html, etiqueta = 'Ventana', { cerrarFuera = false, centrada = false } = {}) {
+    const capa = document.createElement('div');
+    capa.className = centrada ? 'capa centrada' : 'capa';
+    capa.innerHTML = `<div class="hoja" role="dialog" aria-modal="true"><div class="hoja-asa"></div>${html}</div>`;
+    capa.firstElementChild.setAttribute('aria-label', etiqueta);
+    document.body.append(capa);
+    const anterior = document.activeElement;
+    let cerrada = false;
+    const cerrar = () => {
+      if (cerrada) return;
+      cerrada = true;
+      capa.remove();
+      anterior?.focus?.();
+      capa.dispatchEvent(new Event('cerrada'));
+    };
+    capa.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrar(); });
+    if (cerrarFuera) capa.addEventListener('click', (e) => { if (e.target === capa) cerrar(); });
+    arrastrarParaCerrar(capa, cerrar);
+    setTimeout(() => capa.querySelector('button, input, textarea, a')?.focus(), 30);
+    return { capa, cerrar };
+  }
+
+  // Solo para el ejemplo
+  const contenido = '<h2>Título de la hoja</h2><p>Arrastra la franja de arriba hacia abajo o pulsa Escape.</p><button class="boton" type="button" data-cerrar>Cerrar</button>';
+  const abrir = (opciones) => {
+    const { capa, cerrar } = abrirHoja(contenido, 'Ventana de ejemplo', opciones);
+    capa.querySelector('[data-cerrar]').addEventListener('click', cerrar);
+  };
+  document.getElementById('normal').addEventListener('click', () => abrir());
+  document.getElementById('fuera').addEventListener('click', () => abrir({ cerrarFuera: true }));
+  document.getElementById('centrada').addEventListener('click', () => abrir({ centrada: true }));
+</script>
+</body>
+</html>

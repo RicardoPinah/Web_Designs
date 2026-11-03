@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel con título en pastilla</title>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fondo: #CFE6F7; --superficie: #FFFFFF; --borde: #1D2B53; --texto: #1D2B53; --apagado: #4F5D80;
+    --acento: #FFD23F; --sobre-acento: #1D2B53; --sombra: #1D2B53;
+    --grosor: 2px; --radio: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --fondo: #121A33; --superficie: #1E2A4D; --borde: #EAF2FF; --texto: #EAF2FF; --apagado: #9DABC9; --sobre-acento: #121A33; --sombra: #FF8FAB; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100svh; padding: 8px 20px 40px;
+    background: var(--fondo); color: var(--texto);
+    font-family: 'M PLUS Rounded 1c', system-ui, sans-serif; font-weight: 500; line-height: 1.5;
+  }
+  .ejemplo { max-width: 680px; margin: 0 auto; }
+
+  /* El título va en una pastilla montada sobre el borde de arriba, a la izquierda,
+     y el enlace en una pastilla amarilla a la derecha */
+  .panel {
+    position: relative; margin-top: 40px; padding: 30px 12px 12px;
+    background: var(--superficie); border: var(--grosor) solid var(--borde); border-radius: var(--radio); box-shadow: 4px 4px 0 var(--sombra);
+  }
+  .panel-titulo {
+    position: absolute; top: 0; left: 14px; right: 14px; transform: translateY(-50%);
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    pointer-events: none;
+  }
+  .panel-titulo > * { pointer-events: auto; }
+  .panel-titulo h2 {
+    background: var(--superficie); border: var(--grosor) solid var(--borde); border-radius: 999px;
+    padding: 3px 14px; font-size: 17px; font-weight: 800; line-height: 1.3; margin: 0;
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .panel-titulo a {
+    flex-shrink: 0; background: var(--acento); color: var(--sobre-acento); border: var(--grosor) solid var(--borde); border-radius: 999px;
+    padding: 3px 10px; font-size: 12px; font-weight: 800; text-decoration: none;
+  }
+
+  /* Dentro: filas sin sombra, con el color del fondo */
+  .panel-filas { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .panel-filas li { padding: 12px 14px; background: var(--fondo); border: 1.5px solid var(--borde); border-radius: var(--radio); }
+  .panel-filas strong { display: block; font-weight: 800; }
+  .panel-filas span { color: var(--apagado); font-size: 13px; }
+</style>
+</head>
+<body>
+  <div class="ejemplo">
+    <section class="panel">
+      <div class="panel-titulo">
+        <h2>Lo más visto</h2>
+        <a href="#">Ver más</a>
+      </div>
+      <ul class="panel-filas">
+        <li><strong>Primer elemento</strong><span>Una línea de descripción</span></li>
+        <li><strong>Segundo elemento</strong><span>Una línea de descripción</span></li>
+        <li><strong>Tercer elemento</strong><span>Una línea de descripción</span></li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <div class="panel-titulo">
+        <h2>Solo con título</h2>
+      </div>
+      <p style="margin: 0">El enlace de la derecha es opcional.</p>
+    </section>
+  </div>
+</body>
+</html>

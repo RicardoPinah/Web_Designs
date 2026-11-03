@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fondo de cielo con nubes y estrellas</title>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fondo: #CFE6F7;
+    --texto: #1D2B53;
+    --cielo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='340'%3E%3Cg fill='%23fff' fill-opacity='.6'%3E%3Ccircle cx='62' cy='72' r='20'/%3E%3Ccircle cx='90' cy='60' r='28'/%3E%3Ccircle cx='120' cy='74' r='18'/%3E%3Crect x='42' y='72' width='96' height='20' rx='10'/%3E%3Ccircle cx='300' cy='232' r='14'/%3E%3Ccircle cx='320' cy='222' r='20'/%3E%3Ccircle cx='342' cy='234' r='13'/%3E%3Crect x='286' y='232' width='70' height='15' rx='7.5'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  :root[data-tema="intermedio"] {
+    --fondo: #8FB3D1;
+    --texto: #15203D;
+    --cielo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='340'%3E%3Cg fill='%23E4EEF7' fill-opacity='.35'%3E%3Ccircle cx='62' cy='72' r='20'/%3E%3Ccircle cx='90' cy='60' r='28'/%3E%3Ccircle cx='120' cy='74' r='18'/%3E%3Crect x='42' y='72' width='96' height='20' rx='10'/%3E%3Ccircle cx='300' cy='232' r='14'/%3E%3Ccircle cx='320' cy='222' r='20'/%3E%3Ccircle cx='342' cy='234' r='13'/%3E%3Crect x='286' y='232' width='70' height='15' rx='7.5'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  :root[data-tema="oscuro"] {
+    --fondo: #121A33;
+    --texto: #EAF2FF;
+    --cielo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='340'%3E%3Cg fill='%23EAF2FF' fill-opacity='.5'%3E%3Ccircle cx='40' cy='50' r='1.6'/%3E%3Ccircle cx='150' cy='110' r='1.2'/%3E%3Ccircle cx='260' cy='40' r='2'/%3E%3Ccircle cx='370' cy='150' r='1.4'/%3E%3Ccircle cx='90' cy='250' r='1.8'/%3E%3Ccircle cx='210' cy='300' r='1.2'/%3E%3Ccircle cx='330' cy='280' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  /* Sin tema elegido, sigue el modo del sistema */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema]) {
+      --fondo: #121A33;
+      --texto: #EAF2FF;
+      --cielo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='340'%3E%3Cg fill='%23EAF2FF' fill-opacity='.5'%3E%3Ccircle cx='40' cy='50' r='1.6'/%3E%3Ccircle cx='150' cy='110' r='1.2'/%3E%3Ccircle cx='260' cy='40' r='2'/%3E%3Ccircle cx='370' cy='150' r='1.4'/%3E%3Ccircle cx='90' cy='250' r='1.8'/%3E%3Ccircle cx='210' cy='300' r='1.2'/%3E%3Ccircle cx='330' cy='280' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+    }
+  }
+
+  html { background: var(--fondo); }
+  body {
+    margin: 0; min-height: 100svh; padding: 40px 20px;
+    /* El tamaño debe coincidir con el width y height del SVG */
+    background: var(--fondo) var(--cielo);
+    background-size: 420px 340px;
+    color: var(--texto);
+    font-family: 'M PLUS Rounded 1c', system-ui, sans-serif; font-weight: 500;
+    box-sizing: border-box;
+  }
+
+  /* Solo para el ejemplo */
+  h1 { margin: 0 0 16px; font-weight: 800; font-size: 28px; }
+  .temas { display: flex; flex-wrap: wrap; gap: 8px; }
+  .temas button { height: 44px; padding: 0 14px; border-radius: 12px; border: 2px solid var(--texto); background: transparent; color: inherit; font: inherit; font-weight: 800; cursor: pointer; }
+</style>
+</head>
+<body>
+  <h1>Un cielo de fondo</h1>
+  <div class="temas">
+    <button type="button" data-tema="">Según el sistema</button>
+    <button type="button" data-tema="claro">Claro</button>
+    <button type="button" data-tema="intermedio">Intermedio</button>
+    <button type="button" data-tema="oscuro">Oscuro</button>
+  </div>
+
+<script>
+  document.querySelectorAll('.temas button').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      if (boton.dataset.tema) document.documentElement.dataset.tema = boton.dataset.tema;
+      else delete document.documentElement.dataset.tema;
+    });
+  });
+</script>
+</body>
+</html>

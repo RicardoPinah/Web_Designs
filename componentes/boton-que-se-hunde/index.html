@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Botón que se hunde</title>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fondo: #CFE6F7; --superficie: #FFFFFF; --borde: #1D2B53; --texto: #1D2B53; --acento: #FFD23F; --sobre-acento: #1D2B53;
+    --rosa: #FF8FAB; --sombra: #1D2B53; --error: #C62828;
+    --grosor: 2px; --radio-control: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --fondo: #121A33; --superficie: #1E2A4D; --borde: #EAF2FF; --texto: #EAF2FF; --sobre-acento: #121A33; --sombra: #FF8FAB; --error: #FF8A80; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100svh; padding: 32px 20px;
+    background: var(--fondo); color: var(--texto);
+    font-family: 'M PLUS Rounded 1c', system-ui, sans-serif; font-weight: 500;
+  }
+  .ejemplo { max-width: 480px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+
+  :focus-visible { outline: 3px solid var(--rosa); outline-offset: 2px; }
+
+  .boton {
+    height: 48px; padding: 0 18px; border-radius: var(--radio-control);
+    border: var(--grosor) solid var(--borde); background: var(--acento); color: var(--sobre-acento);
+    font: inherit; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 3px 3px 0 var(--sombra);
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.2s, filter 0.2s;
+  }
+  .boton:hover { filter: brightness(1.05); }
+  /* Se hunde en su sombra al pulsar */
+  .boton:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--sombra); }
+  .boton:disabled { opacity: 0.6; cursor: wait; }
+
+  .boton.secundario { background: var(--superficie); color: var(--texto); }
+  .boton.secundario:hover { background: color-mix(in srgb, var(--acento) 25%, var(--superficie)); filter: none; }
+  .boton.peligro { background: var(--superficie); color: var(--error); border-color: var(--error); box-shadow: 3px 3px 0 var(--error); }
+  .boton.peligro:active { box-shadow: 1px 1px 0 var(--error); }
+  .boton.pequeno { height: 40px; padding: 0 14px; font-size: 13px; }
+  .boton.ancho { width: 100%; }
+</style>
+</head>
+<body>
+  <div class="ejemplo">
+    <button class="boton" type="button">Principal</button>
+    <button class="boton secundario" type="button">Secundario</button>
+    <button class="boton peligro" type="button">Borrar</button>
+    <button class="boton pequeno" type="button">Pequeño</button>
+    <button class="boton" type="button" disabled>Desactivado</button>
+    <a class="boton ancho" href="#">Enlace a todo el ancho</a>
+  </div>
+</body>
+</html>

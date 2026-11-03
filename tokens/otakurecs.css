@@ -1,0 +1,140 @@
+/* OtakuRecs · tokens del estilo «Cel»: la viñeta animada.
+   Cielo, contornos gruesos, esquinas redondeadas, sombras duras, botones amarillos y toques rosas.
+   Tres temas: claro (por defecto), intermedio y oscuro. Se eligen con data-tema en <html>;
+   sin data-tema, sigue el modo del sistema.
+   Letra M PLUS Rounded 1c (licencia SIL Open Font License), desde Google Fonts. */
+
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap');
+
+:root {
+  --fondo: #CFE6F7;
+  --superficie: #FFFFFF;
+  --borde: #1D2B53;
+  --linea: #A9C6DE;
+  --texto: #1D2B53;
+  --texto-2: #34436B;
+  --apagado: #4F5D80;
+  /* Amarillo: botones principales y lo que está elegido */
+  --acento: #FFD23F;
+  --sobre-acento: #1D2B53;
+  /* Rosa: barras de progreso, avisos y detalles; --rosa-texto es la versión que se lee como texto */
+  --rosa: #FF8FAB;
+  --rosa-texto: #C2185B;
+  --sobre-rosa: #1D2B53;
+  --sombra: #1D2B53;
+  /* Contadores: rojo para avisos, morado para novedades */
+  --rojo-aviso: #D92D20;
+  --sobre-rojo: #FFFFFF;
+  --morado: #7C3AED;
+  --sobre-morado: #FFFFFF;
+  /* Nota marcada como con rotulador: texto en tinta con el amarillo debajo */
+  --nota: #FFD23F;
+  --nota-texto: var(--texto);
+  --nota-marca: inset 0 -0.42em 0 var(--nota);
+  --ok: #1E7A44;
+  --error: #C62828;
+  --mensaje-error: #FDE4E8;
+  --mensaje-ok: #DDF3E5;
+  /* Nubes del fondo: se usa con background-size: 420px 340px */
+  --cielo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='340'%3E%3Cg fill='%23fff' fill-opacity='.6'%3E%3Ccircle cx='62' cy='72' r='20'/%3E%3Ccircle cx='90' cy='60' r='28'/%3E%3Ccircle cx='120' cy='74' r='18'/%3E%3Crect x='42' y='72' width='96' height='20' rx='10'/%3E%3Ccircle cx='300' cy='232' r='14'/%3E%3Ccircle cx='320' cy='222' r='20'/%3E%3Ccircle cx='342' cy='234' r='13'/%3E%3Crect x='286' y='232' width='70' height='15' rx='7.5'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* Formas */
+  --grosor: 2px;
+  --radio: 14px;
+  --radio-control: 12px;
+  --radio-hoja: 24px;
+  --radio-portada: 10px;
+
+  /* Sombras duras */
+  --sombra-suave: 2px 2px 0 var(--sombra);
+  --sombra-boton: 3px 3px 0 var(--sombra);
+  --sombra-tarjeta: 4px 4px 0 var(--sombra);
+  --sombra-ventana: 6px 6px 0 var(--sombra);
+
+  /* Espaciados y medidas */
+  --ancho-contenido: 680px;
+  --margen-lateral: 20px;
+  --alto-boton: 48px;
+  --alto-toque: 44px;
+
+  /* Letra */
+  --fuente-titulo: 'M PLUS Rounded 1c', system-ui, sans-serif;
+  --fuente: 'M PLUS Rounded 1c', system-ui, sans-serif;
+
+  color-scheme: light;
+}
+
+:root[data-tema="intermedio"] {
+  --fondo: #8FB3D1;
+  --superficie: #E4EEF7;
+  --borde: #15203D;
+  --linea: #6F93B2;
+  --texto: #15203D;
+  --texto-2: #22305A;
+  --apagado: #2E3D63;
+  --sobre-acento: #15203D;
+  --rosa-texto: #8E1240;
+  --sobre-rosa: #15203D;
+  --sombra: #15203D;
+  --ok: #14532D;
+  --error: #8E1515;
+  --mensaje-error: #F3D3DA;
+  --mensaje-ok: #CDE6D6;
+  --cielo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='340'%3E%3Cg fill='%23E4EEF7' fill-opacity='.35'%3E%3Ccircle cx='62' cy='72' r='20'/%3E%3Ccircle cx='90' cy='60' r='28'/%3E%3Ccircle cx='120' cy='74' r='18'/%3E%3Crect x='42' y='72' width='96' height='20' rx='10'/%3E%3Ccircle cx='300' cy='232' r='14'/%3E%3Ccircle cx='320' cy='222' r='20'/%3E%3Ccircle cx='342' cy='234' r='13'/%3E%3Crect x='286' y='232' width='70' height='15' rx='7.5'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Oscuro: el dibujo animado de noche. Contorno claro, sombra dura rosa y estrellas en el fondo */
+:root[data-tema="oscuro"] {
+  --fondo: #121A33;
+  --superficie: #1E2A4D;
+  --borde: #EAF2FF;
+  --linea: #33416A;
+  --texto: #EAF2FF;
+  --texto-2: #C6D2EA;
+  --apagado: #9DABC9;
+  --sobre-acento: #121A33;
+  --rosa-texto: #FF8FAB;
+  --sobre-rosa: #121A33;
+  --sombra: #FF8FAB;
+  --rojo-aviso: #FF6B6B;
+  --sobre-rojo: #121A33;
+  --morado: #B79CFF;
+  --sobre-morado: #121A33;
+  --nota-texto: var(--nota);
+  --nota-marca: none;
+  --ok: #8FD9A8;
+  --error: #FF8A80;
+  --mensaje-error: #3A1F2E;
+  --mensaje-ok: #1C3326;
+  --cielo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='340'%3E%3Cg fill='%23EAF2FF' fill-opacity='.5'%3E%3Ccircle cx='40' cy='50' r='1.6'/%3E%3Ccircle cx='150' cy='110' r='1.2'/%3E%3Ccircle cx='260' cy='40' r='2'/%3E%3Ccircle cx='370' cy='150' r='1.4'/%3E%3Ccircle cx='90' cy='250' r='1.8'/%3E%3Ccircle cx='210' cy='300' r='1.2'/%3E%3Ccircle cx='330' cy='280' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+  color-scheme: dark;
+}
+
+/* Sin tema elegido, sigue el modo del sistema (los mismos valores que el oscuro) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema]) {
+    --fondo: #121A33;
+    --superficie: #1E2A4D;
+    --borde: #EAF2FF;
+    --linea: #33416A;
+    --texto: #EAF2FF;
+    --texto-2: #C6D2EA;
+    --apagado: #9DABC9;
+    --sobre-acento: #121A33;
+    --rosa-texto: #FF8FAB;
+    --sobre-rosa: #121A33;
+    --sombra: #FF8FAB;
+    --rojo-aviso: #FF6B6B;
+    --sobre-rojo: #121A33;
+    --morado: #B79CFF;
+    --sobre-morado: #121A33;
+    --nota-texto: var(--nota);
+    --nota-marca: none;
+    --ok: #8FD9A8;
+    --error: #FF8A80;
+    --mensaje-error: #3A1F2E;
+    --mensaje-ok: #1C3326;
+    --cielo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='340'%3E%3Cg fill='%23EAF2FF' fill-opacity='.5'%3E%3Ccircle cx='40' cy='50' r='1.6'/%3E%3Ccircle cx='150' cy='110' r='1.2'/%3E%3Ccircle cx='260' cy='40' r='2'/%3E%3Ccircle cx='370' cy='150' r='1.4'/%3E%3Ccircle cx='90' cy='250' r='1.8'/%3E%3Ccircle cx='210' cy='300' r='1.2'/%3E%3Ccircle cx='330' cy='280' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+    color-scheme: dark;
+  }
+}
