@@ -4,7 +4,7 @@
 
 **Proyecto de origen:** Hive (prueba piloto de 3D de la fase 3, del 12/11/2026), con los colores de Lignum Domus, que es donde más encaja: muebles reales en 3D.
 
-**Estado:** prueba piloto. El modelo es una mesa de prueba sin texturas, hecha con un script de Blender. Falta la captura (`captura.png`) y verlo en un móvil de verdad.
+**Estado:** prueba piloto. El modelo es una mesa de prueba sin texturas, hecha con un script de Blender. Ricardo lo revisó en escritorio el 12/11/2026. Falta verlo en un móvil de verdad y con un mueble real.
 
 **Colores:** `#1c211e`, `#2b312d` (fondo del modelo), `#f2f3ef`, `#c4c9c4` y `#f99a31` (acento).
 
@@ -21,3 +21,4 @@
 - Lo que dura el recorrido es la altura de `.fijar.con-scroll` (ahora, 220 % de la pantalla además de la propia sección).
 - `loading="lazy"` hace que el modelo no se descargue hasta que la sección se acerca a la pantalla. Para una web de verdad, añade `poster="imagen.webp"` con una foto del modelo: se ve al momento mientras carga.
 - Los textos son de ejemplo.
+- La `captura.png` está sacada con el mismo modelo sin comprimir: Chrome sin ventana no termina de descomprimir Draco. En un navegador normal el modelo comprimido carga bien.
