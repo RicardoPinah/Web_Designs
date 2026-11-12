@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modelo 3D que gira con el scroll</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- El visor de 3D (model-viewer, de Google). Es un módulo: no frena la carga de la página. -->
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+<style>
+  :root {
+    --oscuro: #1c211e;
+    --sala: #2b312d;
+    --claro: #f2f3ef;
+    --acento-1: #f99a31;
+    --apagado-sobre-oscuro: #c4c9c4;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'Instrument Sans', system-ui, sans-serif;
+    --edge: max(clamp(1.5rem, 6vw, 6rem), calc((100vw - 104rem) / 2));
+    --space: clamp(7rem, 13vw, 15rem);
+    --curva-salida: cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: var(--oscuro); color: var(--claro); font: 400 1.125rem/1.7 var(--body); overflow-x: clip; }
+  h2, h3 { margin: 0; font-family: var(--display); font-weight: 400; }
+  h2 { font-size: clamp(2.125rem, 1.6rem + 1.9vw, 3.625rem); line-height: 1.15; }
+  h3 { font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem); line-height: 1.25; }
+  p { margin: 0; color: var(--apagado-sobre-oscuro); }
+  .relleno { display: grid; place-items: center; min-height: 70vh; color: var(--apagado-sobre-oscuro); }
+
+  .pieza {
+    display: grid;
+    grid-template-columns: minmax(0, 10fr) minmax(0, 13fr);
+    align-items: center;
+    gap: clamp(2.5rem, 6vw, 7rem);
+    padding: var(--space) var(--edge);
+  }
+  .pieza-texto { display: grid; gap: 2.2rem; }
+  .pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.6rem; }
+  .paso { display: grid; gap: 0.4rem; padding-left: 1.4rem; border-left: 2px solid rgb(242 243 239 / 0.18); }
+  .paso-numero { font: 600 0.8125rem/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--acento-1); }
+
+  .visor {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: radial-gradient(120% 90% at 50% 20%, #343b36, var(--sala) 60%);
+    border-radius: clamp(0.6rem, 1.1vw, 1.1rem);
+    box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.35);
+    overflow: hidden;
+  }
+  model-viewer { width: 100%; height: 100%; background: transparent; --poster-color: transparent; --progress-bar-color: var(--acento-1); }
+  .visor-aviso { position: absolute; inset: auto 0 1rem; text-align: center; font-size: 0.875rem; color: var(--apagado-sobre-oscuro); pointer-events: none; }
+  .avance { position: absolute; left: 1.25rem; right: 1.25rem; bottom: 0.9rem; height: 2px; background: rgb(242 243 239 / 0.15); display: none; }
+  .avance span { display: block; height: 100%; background: var(--acento-1); transform-origin: left; transform: scaleX(0); }
+
+  /* Con scroll: la sección queda fija mientras el modelo gira y los pasos se van encendiendo. */
+  .fijar.con-scroll { height: calc(100svh + 220svh); }
+  .con-scroll .pieza { position: sticky; top: 0; min-height: 100svh; padding-block: 2rem; }
+  .con-scroll .paso { opacity: 0.32; transition: opacity 0.5s var(--curva-salida), border-color 0.5s var(--curva-salida); }
+  .con-scroll .paso.activo { opacity: 1; border-left-color: var(--acento-1); }
+  .con-scroll .avance { display: block; }
+  .con-scroll .visor-aviso { display: none; }
+
+  /* Móvil: sin sección fija. El modelo se gira con el dedo y los pasos se leen seguidos. */
+  @media (max-width: 60rem) {
+    .pieza { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
+    .visor { order: -1; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="relleno">Baja para ver la pieza</div>
+
+  <div class="fijar">
+    <section class="pieza" aria-labelledby="pieza-titulo">
+      <div class="pieza-texto">
+        <h2 id="pieza-titulo">Una mesa, vista por todos sus lados</h2>
+        <ol class="pasos">
+          <li class="paso">
+            <span class="paso-numero">01 · De frente</span>
+            <h3>Proporciones</h3>
+            <p>Texto de ejemplo sobre el tamaño y la forma de la pieza.</p>
+          </li>
+          <li class="paso">
+            <span class="paso-numero">02 · De lado</span>
+            <h3>Estructura</h3>
+            <p>Texto de ejemplo sobre las patas y las uniones.</p>
+          </li>
+          <li class="paso">
+            <span class="paso-numero">03 · Desde arriba</span>
+            <h3>Tablero</h3>
+            <p>Texto de ejemplo sobre la madera y el acabado.</p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="visor">
+        <!--
+          loading="lazy": el modelo no se descarga hasta que la sección se acerca a la pantalla.
+          touch-action="pan-y": en el móvil se puede seguir bajando la página con el dedo sobre el modelo.
+          Sin JavaScript (o si el visor no carga) se queda el texto de dentro.
+        -->
+        <model-viewer
+          src="mesa.glb"
+          alt="Modelo en 3D de una mesa de madera"
+          loading="lazy"
+          camera-controls
+          disable-zoom
+          touch-action="pan-y"
+          interaction-prompt="none"
+          environment-image="neutral"
+          exposure="1.1"
+          shadow-intensity="1"
+          shadow-softness="0.9"
+          camera-orbit="-35deg 72deg 105%"
+          interpolation-decay="120">
+          <p style="padding: 2rem; text-align: center;">Aquí va el modelo en 3D de la mesa.</p>
+        </model-viewer>
+        <p class="visor-aviso">Arrastra para girar la mesa</p>
+        <div class="avance" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="relleno">Fin de la sección</div>
+
+<script>
+  // El modelo gira con el scroll: cada parada tiene su punto de vista y su paso de texto.
+  // Sin animaciones (prefers-reduced-motion) o en pantallas estrechas no se fija nada:
+  // queda el modelo, que se gira a mano, y los tres pasos seguidos.
+  const sinMovimiento = matchMedia('(prefers-reduced-motion: reduce)');
+  const ancha = matchMedia('(min-width: 60.01rem)');
+
+  // Punto de vista en cada parada: giro alrededor (grados), altura (90 = de frente, 0 = desde arriba) y distancia (%).
+  const PARADAS = [
+    { giro: -35, altura: 72, distancia: 105 },
+    { giro: 85, altura: 78, distancia: 95 },
+    { giro: 205, altura: 38, distancia: 110 },
+  ];
+
+  const fijar = document.querySelector('.fijar');
+  const visor = document.querySelector('model-viewer');
+  const pasos = [...document.querySelectorAll('.paso')];
+  const barra = document.querySelector('.avance span');
+  const limitar = (valor) => Math.max(0, Math.min(valor, 1));
+  const suavizar = (t) => t * t * (3 - 2 * t);
+  const mezclar = (de, a, t) => de + (a - de) * t;
+
+  let conScroll = false;
+  let pendiente = false;
+
+  /** Coloca la cámara y enciende el paso que toca para un avance de 0 a 1. */
+  function pintar(avance) {
+    const tramos = PARADAS.length - 1;
+    const posicion = avance * tramos;
+    const desde = Math.min(Math.floor(posicion), tramos - 1);
+    const t = suavizar(limitar(posicion - desde));
+    const a = PARADAS[desde];
+    const b = PARADAS[desde + 1];
+    // model-viewer va hacia este punto de vista con su propio suavizado (interpolation-decay).
+    // Se cambia el atributo y no la propiedad: así funciona aunque el visor todavía no haya cargado.
+    visor.setAttribute('camera-orbit', `${mezclar(a.giro, b.giro, t).toFixed(2)}deg ${mezclar(a.altura, b.altura, t).toFixed(2)}deg ${mezclar(a.distancia, b.distancia, t).toFixed(2)}%`);
+    const activo = Math.min(Math.round(posicion), tramos);
+    pasos.forEach((paso, i) => paso.classList.toggle('activo', i === activo));
+    barra.style.transform = `scaleX(${avance})`;
+  }
+
+  function seguir() {
+    pendiente = false;
+    if (!conScroll) return;
+    const { top, height } = fijar.getBoundingClientRect();
+    pintar(limitar(-top / (height - innerHeight)));
+  }
+
+  function alMover() {
+    if (pendiente) return;
+    pendiente = true;
+    requestAnimationFrame(seguir);
+  }
+
+  function preparar() {
+    conScroll = ancha.matches && !sinMovimiento.matches;
+    fijar.classList.toggle('con-scroll', conScroll);
+    // Con scroll manda la página; sin él, el modelo se gira a mano.
+    visor.toggleAttribute('camera-controls', !conScroll);
+    if (conScroll) seguir();
+    else pasos.forEach((paso) => paso.classList.remove('activo'));
+  }
+
+  addEventListener('scroll', alMover, { passive: true });
+  addEventListener('resize', alMover);
+  ancha.addEventListener('change', preparar);
+  sinMovimiento.addEventListener('change', preparar);
+  preparar();
+</script>
+</body>
+</html>
