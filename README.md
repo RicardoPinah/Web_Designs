@@ -23,7 +23,7 @@ Librería personal de diseños reutilizables.
 | [capas-anidadas-scroll](componentes/capas-anidadas-scroll) | Lignum Domus | Sección fija en la que cada marco entra dentro del anterior con su foto y su texto. |
 | [fusion-miniaturas-scroll](componentes/fusion-miniaturas-scroll) | Lignum Domus | Las miniaturas del hero se juntan, se funden y viajan hasta la foto siguiente. |
 | [imagen-que-se-monta](componentes/imagen-que-se-monta) | Lignum Domus | Una imagen se monta pieza a pieza con el scroll. |
-| [modelo-3d-scroll](componentes/modelo-3d-scroll) | Hive (prueba de 3D) | Un modelo en 3D que gira parada a parada al bajar, con su paso de texto. Prueba piloto, sin captura todavía. |
+| [modelo-3d-scroll](componentes/modelo-3d-scroll) | Hive (prueba de 3D) | Un modelo en 3D que gira parada a parada al bajar, con su paso de texto. Prueba piloto, con una mesa de prueba. |
 | [simbolo-viajero](componentes/simbolo-viajero) | Lignum Domus | Un único símbolo recorre la página de parada en parada. |
 | [hero-collage-entrada](componentes/hero-collage-entrada) | Lignum Domus | Entrada con collage de fotos y un marco que se abre hasta llenar la pantalla. |
 | [hero-miniaturas-autoplay](componentes/hero-miniaturas-autoplay) | Lignum Domus | Hero con miniaturas seleccionables, cambio automático y barra de progreso. |
